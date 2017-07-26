@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 """TT URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -15,7 +16,16 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
+from rest_framework import routers
+from django.conf import settings
+from django.conf.urls import include
+router = routers.SimpleRouter()
+router.trailing_slash = '/?'
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
 ]
+
+
+urlpatterns += router.urls

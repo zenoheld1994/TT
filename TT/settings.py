@@ -1,3 +1,4 @@
+#-*- coding: utf-8 -*-
 """
 Django settings for TT project.
 
@@ -25,7 +26,7 @@ SECRET_KEY = '7^_0-&rne$9)nnqh4vdzr0=%crr)9u6gx0vxaja4r)n^*r)gc7'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,6 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_mongoengine',
+    'oauth2_provider',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -75,11 +80,14 @@ WSGI_APPLICATION = 'TT.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+       'ENGINE': 'django.db.backends.postgresql_psycopg2',
+       'NAME': os.getenv('DB_NAME', 'tt'),
+       'USER': os.getenv('DB_USER', 'postgres'),
+       'PASSWORD': os.getenv('DB_PASSWORD', 'linkinpark'),
+       'HOST': os.getenv('DB_HOST', 'localhost'),
+       'PORT': os.getenv('DB_PORT', '5432')
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -99,7 +107,19 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'oauth2_provider.ext.rest_framework.OAuth2Authentication', 
+    )
+}
+'''
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
+}
+'''
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
@@ -116,5 +136,14 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
-
+SERVER_IP =os.getenv('SERVER_IP','http://localhost:5000')
 STATIC_URL = '/static/'
+OAUTH2_PROVIDER = {
+   'SCOPES': {
+       'read': 'Read scope',
+       'write': 'Write scope',
+   },
+
+   'CLIENT_ID_GENERATOR_CLASS': 'oauth2_provider.generators.ClientIdGenerator',
+   'ACCESS_TOKEN_EXPIRE_SECONDS':2592000,
+}
