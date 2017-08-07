@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework_mongoengine',
     'oauth2_provider',
     'corsheaders',
+    'Usuarios',
 ]
 
 MIDDLEWARE = [
@@ -111,7 +112,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
         'oauth2_provider.ext.rest_framework.OAuth2Authentication', 
-    )
+    ),
+    'PAGE_SIZE': 10,
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 '''
 REST_FRAMEWORK = {
@@ -133,7 +136,15 @@ USE_L10N = True
 
 USE_TZ = True
 
+'''
 
+m58NDkAGJYnyIq5oq1puZNIFmVuy5elsdehX09xn
+
+Hf29wTjQE1eUTg7dKKgMTHK8D69lTACGeRROwq1YXO9FrlglL1h2OhwLgQP1LXNHP5Xt6rqzJPas2io5o1FiVznfH9kvrURCqMtmiyfzI3NGa84jKJnrRE3U6LhKlHni
+
+
+zenoheld linkinpark
+'''
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 SERVER_IP =os.getenv('SERVER_IP','http://localhost:5000')
