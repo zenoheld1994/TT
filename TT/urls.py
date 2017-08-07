@@ -19,12 +19,20 @@ from django.contrib import admin
 from rest_framework import routers
 from django.conf import settings
 from django.conf.urls import include
+from Usuarios import api as apiUsuarios
 router = routers.SimpleRouter()
 router.trailing_slash = '/?'
+router.register(r'v1/usuarios',apiUsuarios.UsuariosViewSet,base_name='usuario')
+router.register(r'v1/escuelas',apiUsuarios.EscuelasViewSet,base_name='escuela')
+router.register(r'v1/grupos',apiUsuarios.GruposViewSet,base_name='grupo')
+router.register(r'v1/lecciones',apiUsuarios.LeccionViewSet,base_name='leccion')
+router.register(r'v1/puntuaciones',apiUsuarios.PuntuacionViewSet,base_name='puntuacion')
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    url(r'', include('Usuarios.urls')),
 ]
 
 
