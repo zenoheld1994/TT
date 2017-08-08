@@ -142,32 +142,23 @@ class GrupoSerializer(serializers.Serializer):
 	class Meta:
 		model = Grupos
 		fields = ('nombre','idUsuario')
-	def create(self, validated_data):
-		
-		idUsuarios_data = validated_data.pop('idUsuario')
-		grupo = Grupos.objects.create(**validated_data)
-		for idUsuario_data in idUsuarios_data:
-			#print(**idUsuario_data)
-			#Usuarios.objects.create(grupo=grupo,**idUsuario_data)
-			grupo.idUsuario.add(**idUsuario_data)
-		grupo.save()
-		return grupo
 
-
-	def update(self, instance, validated_data):
-		instance.nombre = validated_data.get('nombre', instance.nombre)
-		instance.idUsuario = validated_data.get('idUsuario', instance.idUsuario)
-		return instance
 
 class GrupoCreateSerializer(serializers.Serializer):
 	nombre = serializers.CharField(required=True)
+	idUsuario = serializers.ListField(required=True)
 	class Meta:
 		model = Grupos
-		fields = ('__all__')
+		fields = ('nombre','idUsuario')
 	def create(self, validated_data):
-		escuela = Grupos(nombre=self.data.get('nombre'))
-		escuela.save()
-		return EscuelaSerializer(escuela).data
+		aux_IdUsuario = self.data.get('idUsuario')
+		
+		grupo = Grupos(nombre=self.data.get('nombre'))
+		grupo.save()
+		for x in aux_IdUsuario:
+			grupo.idUsuario.add(x['idUsuario'])
+		grupo.save()
+		return GrupoSerializer(grupo).data
 
 class LeccionSerializer(serializers.Serializer):
 	idLeccion = serializers.CharField(required=False)
@@ -212,3 +203,4 @@ class PuntuacionSerializer(serializers.Serializer):
 		instance.puntuacion = validated_data.get('puntuacion', instance.puntuacion)
 		instance.save()
 		return instance
+
