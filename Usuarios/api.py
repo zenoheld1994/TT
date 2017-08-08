@@ -17,17 +17,18 @@ from django.http import HttpResponse
 import json 
 from django.views.decorators.csrf import csrf_exempt
 
+
+
 class UsuariosViewSet(mixins.ListModelMixin,
 	#mixins.CreateModelMixin, 
 	mixins.RetrieveModelMixin,
-	#mixins.UpdateModelMixin,
+	mixins.UpdateModelMixin,
 	#mixins.DestroyModelMixin,
 	viewsets.GenericViewSet):
 	serializer_class = UsuarioSerializer
 	permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
 	authentication_classes = [OAuth2Authentication]
 	queryset = Usuarios.objects.all()
-
 	@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
 	def createUsuario(self, request):
 		usuario = UsuarioCreateSerializer(data=request.data)
@@ -35,15 +36,14 @@ class UsuariosViewSet(mixins.ListModelMixin,
 		result = usuario.create(request.data)
 		return Response(result)
 
-	@list_route(methods=['PATCH'], permission_classes=[permissions.AllowAny])
-	def updateUsuario(self, request):
+	def update(self, request):
 		usuario = UsuarioUpdateSerializer(data=request.data)
 		usuario.is_valid(raise_exception=True)
 		result = usuario.update(request.data)
 		return Response(result)
 
 class EscuelasViewSet(mixins.ListModelMixin,
-	#mixins.CreateModelMixin, 
+	mixins.CreateModelMixin, 
 	mixins.RetrieveModelMixin,
 	mixins.UpdateModelMixin,
 	mixins.DestroyModelMixin,
@@ -69,6 +69,12 @@ class GruposViewSet(mixins.ListModelMixin,
 	permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
 	authentication_classes = [OAuth2Authentication]
 	queryset = Grupos.objects.all()
+	#@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
+	def create(self, request):
+		grupo = GrupoCreateSerializer(data=request.data)
+		grupo.is_valid(raise_exception=True)
+		result = grupo.create(request.data)
+		return Response(result)
 
 class LeccionViewSet(mixins.ListModelMixin,
 	mixins.CreateModelMixin, 
