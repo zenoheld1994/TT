@@ -16,7 +16,7 @@ from uuid import uuid4
 from django.http import HttpResponse
 import json 
 from django.views.decorators.csrf import csrf_exempt
-
+from django.contrib.auth import logout
 
 
 class UsuariosViewSet(mixins.ListModelMixin,
@@ -29,18 +29,56 @@ class UsuariosViewSet(mixins.ListModelMixin,
 	permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
 	authentication_classes = [OAuth2Authentication]
 	queryset = Usuarios.objects.all()
+
 	@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
 	def createUsuario(self, request):
 		usuario = UsuarioCreateSerializer(data=request.data)
 		usuario.is_valid(raise_exception=True)
 		result = usuario.create(request.data)
 		return Response(result)
-
-	def update(self, request):
+	#Check permissions for this one
+	@list_route(methods=['PATCH'], permission_classes=[permissions.AllowAny])
+	def updateUsuario(self, request):
 		usuario = UsuarioUpdateSerializer(data=request.data)
 		usuario.is_valid(raise_exception=True)
 		result = usuario.update(request.data)
 		return Response(result)
+	#@csrf_exempt
+	#@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
+	#def logout(self,request):
+	#	logout(request)
+	#	return Response("OK")
+	@csrf_exempt
+	@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
+	def login(self, request):
+		print(request.data)
+		serializer = UsuarioLoginSerializer(data=request.data)
+		serializer.is_valid(raise_exception=True)
+		valid = serializer.validated_data
+		if (valid.get('usuario') is not None):
+			userModel = get_object_or_404(UserAuth, username=valid.get('usuario'))
+			if userModel.is_active:
+				try:
+					user = UserAuth.objects.get(id=userModel.id)
+				except:
+					return Response({'detail': "464"}, status=status.HTTP_401_UNAUTHORIZED,
+								content_type="applicationjson")
+				userAuth = authenticate(username=userModel.username,
+										password=valid.get('contrasena'))
+				if userAuth is not None:
+					login(request, userAuth)
+					resp = Usuarios.objects.get(idUser=userModel.id)
+					print(resp)
+					serResp = UsuarioSerializer(resp).data
+					#serResp['idclient'] = CLIENT_ID#mañana vemos
+					#serResp['clientsecret'] = CLIENT_SECRET
+					return Response(serResp)
+				else:
+					return Response({'detail': "461"}, status=status.HTTP_401_UNAUTHORIZED)
+			else:
+				return Response({'detail': "443"}, status=status.HTTP_401_UNAUTHORIZED)
+		else:
+			return Response({'detail': "464"}, status=status.HTTP_401_UNAUTHORIZED)
 
 class EscuelasViewSet(mixins.ListModelMixin,
 	mixins.CreateModelMixin, 
@@ -52,12 +90,14 @@ class EscuelasViewSet(mixins.ListModelMixin,
 	permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
 	authentication_classes = [OAuth2Authentication]
 	queryset = Escuelas.objects.all()
+	'''
 	@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
 	def createEscuela(self, request):
 		escuela = EscuelaCreateSerializer(data=request.data)
 		escuela.is_valid(raise_exception=True)
 		result = escuela.create(request.data)
 		return Response(result)
+	'''
 
 class GruposViewSet(mixins.ListModelMixin,
 	mixins.CreateModelMixin, 
@@ -69,7 +109,6 @@ class GruposViewSet(mixins.ListModelMixin,
 	permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
 	authentication_classes = [OAuth2Authentication]
 	queryset = Grupos.objects.all()
-	#@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
 	def create(self, request):
 		grupo = GrupoCreateSerializer(data=request.data)
 		grupo.is_valid(raise_exception=True)
@@ -98,4 +137,3 @@ class PuntuacionViewSet(mixins.ListModelMixin,
 	authentication_classes = [OAuth2Authentication]
 	queryset = Puntuaciones.objects.all()
 
-#LeccionSerializer

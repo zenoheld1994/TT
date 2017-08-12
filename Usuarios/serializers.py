@@ -23,6 +23,14 @@ class UsuarioSerializer(serializers.Serializer):
 	def get_usuario(self,obj):
 		userauth = UserAuth.objects.get(pk=obj.idUser)
 		return userauth.username
+
+class UsuarioLoginSerializer(serializers.Serializer):
+	usuario = serializers.CharField(required=True)
+	contrasena = serializers.CharField(required=True)
+	class Meta:
+		model = Usuarios
+		fields = ('usuario','contrasena')
+
 class UsuarioCreateSerializer(serializers.Serializer):
 	tipoUsuario = serializers.BooleanField(required=True)
 	usuario = serializers.CharField(required=True)
@@ -111,7 +119,7 @@ class UsuarioDeleteSerializer(serializers.Serializer):
 		return "OK"
 
 class EscuelaSerializer(serializers.Serializer):
-	idEscuela = serializers.IntegerField(required=True)
+	idEscuela = serializers.IntegerField(required=False)
 	nombre = serializers.CharField(required=True)
 	class Meta:
 		model = Escuelas

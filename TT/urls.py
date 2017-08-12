@@ -33,6 +33,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'', include('Usuarios.urls')),
+    
 ]
 
 
