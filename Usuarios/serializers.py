@@ -14,15 +14,46 @@ class UsuarioSerializer(serializers.Serializer):
 	nombre = serializers.CharField(required=True)
 	idUser = serializers.IntegerField(required=True)
 	idEscuela = serializers.SerializerMethodField()
+	idGrupo = serializers.SerializerMethodField()
+	nombreGrupo = serializers.SerializerMethodField()
+	nombreEscuela = serializers.SerializerMethodField()
 	class Meta:
 		model = Usuarios
-		fields = ('tipoUsuario','usuario','nombre','idEscuela','idUsuario',
-			'idUser')
+		fields = ('tipoUsuario','usuario','nombre','idEscuela','idUsuario','idUser')
 	def get_idEscuela(self,obj):
 		return obj.idEscuela.pk
 	def get_usuario(self,obj):
 		userauth = UserAuth.objects.get(pk=obj.idUser)
 		return userauth.username
+	def get_idGrupo(self,obj):
+		try:
+			return obj.idGrupo.pk
+		except:
+			try:
+				return obj.idGrupo
+			except:
+				return None
+	def get_nombreGrupo(self,obj):
+		try:
+			grupo = Grupos.objects.get(pk=obj.idGrupo.pk)
+			return grupo.nombre
+		except:
+			try:
+				grupo = Grupos.objects.get(pk=obj.idGrupo)
+				return grupo.nombre
+			except:
+				return None
+	def get_nombreEscuela(self,obj):
+		try:
+			escuela = Escuelas.objects.get(pk=obj.idEscuela.pk)
+			return escuela.nombre
+		except:
+			try:
+				escuela = Escuelas.objects.get(pk=obj.idEscuela)
+				return escuela.nombre
+			except:
+				return None
+
 
 class UsuarioLoginSerializer(serializers.Serializer):
 	usuario = serializers.CharField(required=True)
@@ -70,6 +101,7 @@ class UsuarioUpdateSerializer(serializers.Serializer):
 	nombre = serializers.CharField(required=False)
 	usuario = serializers.CharField(required=False)
 	idUsuario = serializers.IntegerField(required=True)
+	idGrupo = serializers.CharField(required=False)
 	#de mientras se enablea el oauth2
 	class Meta:
 		model = Usuarios
@@ -124,6 +156,8 @@ class EscuelaSerializer(serializers.Serializer):
 	class Meta:
 		model = Escuelas
 		fields = ('nombre','idEscuela')
+	def create(self,validated_data):
+		return Escuelas.objects.create(**validated_data)
 	def update(self, instance, validated_data):
 		instance.nombre = validated_data.get('nombre', instance.nombre)
 		instance.save()
@@ -139,34 +173,29 @@ class EscuelaCreateSerializer(serializers.Serializer):
 		escuela.save()
 		return EscuelaSerializer(escuela).data
 		
-class idUsuarioSerializer(serializers.Serializer):
-	#idUsuario = serializers.IntegerField(required=True)
-	class Meta:
-		model = Usuarios
-		fields = ('idUsuario',)
+
 class GrupoSerializer(serializers.Serializer):
 	nombre = serializers.CharField(required=True)
-	idUsuario = idUsuarioSerializer(many=True)
+	idGrupo = serializers.IntegerField(required=False)
+	idUsuario = serializers.IntegerField(required=False)
 	class Meta:
 		model = Grupos
-		fields = ('nombre','idUsuario')
-
-
-class GrupoCreateSerializer(serializers.Serializer):
-	nombre = serializers.CharField(required=True)
-	idUsuario = serializers.ListField(required=True)
-	class Meta:
-		model = Grupos
-		fields = ('nombre','idUsuario')
-	def create(self, validated_data):
-		aux_IdUsuario = self.data.get('idUsuario')
-		
-		grupo = Grupos(nombre=self.data.get('nombre'))
-		grupo.save()
-		for x in aux_IdUsuario:
-			grupo.idUsuario.add(x['idUsuario'])
-		grupo.save()
+		fields = ('nombre','idGrupo','idUsuario')
+	def create(self, validated_data,auxid):
+		grupo = Grupos.objects.create(**validated_data)
+		user = Usuarios.objects.get(pk=auxid)
+		user.idGrupo = grupo
 		return GrupoSerializer(grupo).data
+	def update(self, instance, validated_data):
+		instance.nombre = validated_data.get('nombre', instance.nombre)
+		try:
+			auxUser = Usuarios.objects.get(pk=validated_data.get('idUsuario'))
+			auxUser.idGrupo = instance
+			auxUser.save()
+		except:
+			None
+		instance.save()
+		return instance
 
 class LeccionSerializer(serializers.Serializer):
 	idLeccion = serializers.CharField(required=False)

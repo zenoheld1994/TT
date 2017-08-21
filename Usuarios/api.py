@@ -23,7 +23,7 @@ class UsuariosViewSet(mixins.ListModelMixin,
 	#mixins.CreateModelMixin, 
 	mixins.RetrieveModelMixin,
 	mixins.UpdateModelMixin,
-	#mixins.DestroyModelMixin,
+	mixins.DestroyModelMixin,
 	viewsets.GenericViewSet):
 	serializer_class = UsuarioSerializer
 	permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
@@ -43,11 +43,7 @@ class UsuariosViewSet(mixins.ListModelMixin,
 		usuario.is_valid(raise_exception=True)
 		result = usuario.update(request.data)
 		return Response(result)
-	#@csrf_exempt
-	#@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
-	#def logout(self,request):
-	#	logout(request)
-	#	return Response("OK")
+
 	@csrf_exempt
 	@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
 	def login(self, request):
@@ -70,8 +66,7 @@ class UsuariosViewSet(mixins.ListModelMixin,
 					resp = Usuarios.objects.get(idUser=userModel.id)
 					print(resp)
 					serResp = UsuarioSerializer(resp).data
-					#serResp['idclient'] = CLIENT_ID#mañana vemos
-					#serResp['clientsecret'] = CLIENT_SECRET
+
 					return Response(serResp)
 				else:
 					return Response({'detail': "461"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -90,14 +85,7 @@ class EscuelasViewSet(mixins.ListModelMixin,
 	permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
 	authentication_classes = [OAuth2Authentication]
 	queryset = Escuelas.objects.all()
-	'''
-	@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
-	def createEscuela(self, request):
-		escuela = EscuelaCreateSerializer(data=request.data)
-		escuela.is_valid(raise_exception=True)
-		result = escuela.create(request.data)
-		return Response(result)
-	'''
+
 
 class GruposViewSet(mixins.ListModelMixin,
 	mixins.CreateModelMixin, 
@@ -109,11 +97,12 @@ class GruposViewSet(mixins.ListModelMixin,
 	permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
 	authentication_classes = [OAuth2Authentication]
 	queryset = Grupos.objects.all()
-	def create(self, request):
-		grupo = GrupoCreateSerializer(data=request.data)
-		grupo.is_valid(raise_exception=True)
-		result = grupo.create(request.data)
+	def create(self,request):
+		ser = GrupoSerializer(data=request.data)
+		ser.is_valid(raise_exception=True)
+		result = ser.create(request.data,auxid=request.user.pk)
 		return Response(result)
+
 
 class LeccionViewSet(mixins.ListModelMixin,
 	mixins.CreateModelMixin, 
@@ -132,7 +121,7 @@ class PuntuacionViewSet(mixins.ListModelMixin,
 	mixins.UpdateModelMixin,
 	mixins.DestroyModelMixin,
 	viewsets.GenericViewSet):
-	serializer_class = PuntuacionAuxSerializer
+	serializer_class = PuntuacionSerializer
 	permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
 	authentication_classes = [OAuth2Authentication]
 	queryset = Puntuaciones.objects.all()

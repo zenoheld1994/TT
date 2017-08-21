@@ -138,16 +138,15 @@ USE_TZ = True
 
 '''
 
-m58NDkAGJYnyIq5oq1puZNIFmVuy5elsdehX09xn
+bqpOEjq8VWmgSiw881b4E1ZCU6t52h8QGBlAO7JM
 
-Hf29wTjQE1eUTg7dKKgMTHK8D69lTACGeRROwq1YXO9FrlglL1h2OhwLgQP1LXNHP5Xt6rqzJPas2io5o1FiVznfH9kvrURCqMtmiyfzI3NGa84jKJnrRE3U6LhKlHni
-
+UJ4QINZtrsosUZ3kXGGcLsC9fysgMpJSDV4shFvbRDLZE3B5pnK9qvtKTtNeb01kX2MjbY857yXkYlqjI1rWNhjmj4HWHcVTWzJqyqySAopSvvbkn0i279RUmI7mmo4y
 
 zenoheld linkinpark
 '''
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
-SERVER_IP =os.getenv('SERVER_IP','http://localhost:5000')
+SERVER_IP =os.getenv('SERVER_IP','localhost:5000')
 STATIC_URL = '/static/'
 OAUTH2_PROVIDER = {
    'SCOPES': {

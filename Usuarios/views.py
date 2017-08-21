@@ -17,12 +17,28 @@ from TT.settings import OAUTH2_PROVIDER,SERVER_IP
 # Create your views here.
 def login_page(request):
     return render(request, 'Superadmin/login.html', {})
+
+def user_list(request):
+	#obtain usesr
+
+	url = "http://"+SERVER_IP+"/v1/usuarios/"
+
+	headers = {
+	    'authorization': "Bearer AgXAJlRVIq2fYYGmCVZ2GEJ5j5eNhE",
+	    'cache-control': "no-cache",
+	    'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
+	    }
+
+	response = requests.request("GET", url, headers=headers)
+	users = json.loads(response.text)
+	return render(request, 'Superadmin/user_list.html', {"users":users["results"]})
 def dashboardAdmin(request):
 	
 	
 	try:
 		tokenSession = AccessToken.objects.get(token=request.session['token'])
 		ID = request.session['userid']
+		#name = request.session['username']
 		if timezone.now() > tokenSession.expires:
 			#print("ERRROR1")
 			request.session['token'] = None
@@ -43,20 +59,18 @@ def dashboardAdmin(request):
 def loginAdminSuccess(request):
 	username = request.POST.get("user", "")
 	password = request.POST.get("password", "")
-	print(username,password)
 	url = SERVER_IP + "/o/token/"
 	payload = "grant_type=password&password="+password+"&username="+username+""
 	headers = {
 	'content-type': "application/x-www-form-urlencoded",
-	'authorization': "Basic bTU4TkRrQUdKWW55SXE1b3ExcHVaTklGbVZ1eTVlbHNkZWhYMDl4bjpIZjI5d1RqUUUxZVVUZzdkS0tnTVRISzhENjlsVEFDR2VSUk93cTFZWE85RnJsZ2xMMWgyT2h3TGdRUDFMWE5IUDVYdDZycXpKUGFzMmlvNW8xRmlWem5mSDlrdnJVUkNxTXRtaXlmekkzTkdhODRqS0puclJFM1U2TGhLbEhuaQ==",
+	'authorization': "Basic YnFwT0VqcThWV21nU2l3ODgxYjRFMVpDVTZ0NTJoOFFHQmxBTzdKTTpVSjRRSU5adHJzb3NVWjNrWEdHY0xzQzlmeXNnTXBKU0RWNHNoRnZiUkRMWkUzQjVwbks5cXZ0S1R0TmViMDFrWDJNamJZODU3eVhrWWxxakkxcldOaGptajRIV0hjVlRXekpxeXF5U0FvcFN2dmJrbjBpMjc5UlVtSTdtbW80eQ==",
 	'cache-control': "no-cache",
 	'postman-token': "2aef8a64-1763-d159-6c6d-77b816ffd285"
 	}
 	response = requests.request("POST", url, data=payload, headers=headers)
 
 	token_json = response.json()
-	#print(token_json)
-	#print(token_json['access_token'])
+
 	userModel = get_object_or_404(UserAuth, username=username)
 	try:
 		user = UserAuth.objects.get(id=userModel.id, is_superuser=1)
