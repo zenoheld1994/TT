@@ -7,4 +7,7 @@ urlpatterns = [
 	url(r'^admin_successful_login$', views.loginAdminSuccess),
 	url(r'^logout_admin$', views.logout_view),
 	url(r'^userList$', views.user_list),
+	url(r'^schoolCreate$', views.school_create),
+	url(r'^saveSchool$', views.school_save),
+	url(r'^schoolList$', views.school_list),
 ]

@@ -17,7 +17,11 @@ from django.http import HttpResponse
 import json 
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import logout
-
+class SuperAdminPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        idp = request.user.pk
+        admin = UserAuth.objects.filter(id=idp,is_superuser=True).exists()
+        return admin
 
 class UsuariosViewSet(mixins.ListModelMixin,
 	#mixins.CreateModelMixin, 
@@ -26,7 +30,7 @@ class UsuariosViewSet(mixins.ListModelMixin,
 	mixins.DestroyModelMixin,
 	viewsets.GenericViewSet):
 	serializer_class = UsuarioSerializer
-	permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
+	permission_classes = [SuperAdminPermission, TokenHasReadWriteScope]
 	authentication_classes = [OAuth2Authentication]
 	queryset = Usuarios.objects.all()
 
@@ -43,6 +47,12 @@ class UsuariosViewSet(mixins.ListModelMixin,
 		usuario.is_valid(raise_exception=True)
 		result = usuario.update(request.data)
 		return Response(result)
+	@list_route(methods=['GET'], permission_classes=[SuperAdminPermission])
+	def getUsuarios(self, request):
+		usuarios = Usuarios.objects.all()
+		seruser = UsuarioSerializer(usuarios,many=True)
+		
+		return Response(seruser.data)
 
 	@csrf_exempt
 	@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
@@ -64,7 +74,6 @@ class UsuariosViewSet(mixins.ListModelMixin,
 				if userAuth is not None:
 					login(request, userAuth)
 					resp = Usuarios.objects.get(idUser=userModel.id)
-					print(resp)
 					serResp = UsuarioSerializer(resp).data
 
 					return Response(serResp)
@@ -85,6 +94,11 @@ class EscuelasViewSet(mixins.ListModelMixin,
 	permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
 	authentication_classes = [OAuth2Authentication]
 	queryset = Escuelas.objects.all()
+	@list_route(methods=['GET'], permission_classes=[SuperAdminPermission])
+	def getEscuelas(self, request):
+		escuelas = Escuelas.objects.all()
+		serescuela = EscuelaSerializer(escuelas,many=True)
+		return Response(serescuela.data)
 
 
 class GruposViewSet(mixins.ListModelMixin,

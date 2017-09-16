@@ -86,7 +86,8 @@ DATABASES = {
        'USER': os.getenv('DB_USER', 'postgres'),
        'PASSWORD': os.getenv('DB_PASSWORD', 'linkinpark'),
        'HOST': os.getenv('DB_HOST', 'localhost'),
-       'PORT': os.getenv('DB_PORT', '5432')
+       'PORT': os.getenv('DB_PORT', '5432'),
+       'CHARSET': 'latin1',
     }
 }
 
@@ -128,6 +129,8 @@ REST_FRAMEWORK = {
 
 LANGUAGE_CODE = 'en-us'
 
+DEFAULT_CHARSET='latin1'
+
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
@@ -138,15 +141,18 @@ USE_TZ = True
 
 '''
 
-bqpOEjq8VWmgSiw881b4E1ZCU6t52h8QGBlAO7JM
 
-UJ4QINZtrsosUZ3kXGGcLsC9fysgMpJSDV4shFvbRDLZE3B5pnK9qvtKTtNeb01kX2MjbY857yXkYlqjI1rWNhjmj4HWHcVTWzJqyqySAopSvvbkn0i279RUmI7mmo4y
+
 
 zenoheld linkinpark
 '''
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
+BASIC_TOKEN = "YnFwT0VqcThWV21nU2l3ODgxYjRFMVpDVTZ0NTJoOFFHQmxBTzdKTTpVSjRRSU5adHJzb3NVWjNrWEdHY0xzQzlmeXNnTXBKU0RWNHNoRnZiUkRMWkUzQjVwbks5cXZ0S1R0TmViMDFrWDJNamJZODU3eVhrWWxxakkxcldOaGptajRIV0hjVlRXekpxeXF5U0FvcFN2dmJrbjBpMjc5UlVtSTdtbW80eQ=="
+CLIENT_ID = "bqpOEjq8VWmgSiw881b4E1ZCU6t52h8QGBlAO7JM"
+CLIENT_SECRET="UJ4QINZtrsosUZ3kXGGcLsC9fysgMpJSDV4shFvbRDLZE3B5pnK9qvtKTtNeb01kX2MjbY857yXkYlqjI1rWNhjmj4HWHcVTWzJqyqySAopSvvbkn0i279RUmI7mmo4y"
 SERVER_IP =os.getenv('SERVER_IP','localhost:5000')
+
 STATIC_URL = '/static/'
 OAUTH2_PROVIDER = {
    'SCOPES': {

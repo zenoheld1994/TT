@@ -1,0 +1,12 @@
+{% extends 'Superadmin/menu_layout.html' %}
+  {% block content %}
+{% load staticfiles %}
+
+	{% block title %}Welcome{% endblock %}
+	<h1>Bienvenido {{username}}</h1>
+	<script type="text/javascript">
+
+		var set_active = document.getElementById("home");
+		set_active.className += " active";
+	</script>
+{% endblock %}   
