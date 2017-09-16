@@ -232,8 +232,8 @@ class PuntuacionSerializer(serializers.Serializer):
 	def create(self,validated_data):
 		idUsuario_aux = Usuarios.objects.get(idUsuario=validated_data.pop('idUsuario'))
 		idLeccion_aux = Leccion.objects.get(pk=validated_data.pop('idLeccion'))
-
-		return PuntuacionAuxSerializer(Puntuaciones.objects.create(**validated_data,idUsuario=idUsuario_aux,idLeccion=idLeccion_aux)).data
+		puntuacion_aux = Puntuaciones.objects.create(**validated_data,idUsuario=idUsuario_aux,idLeccion=idLeccion_aux)
+		return PuntuacionAuxSerializer(puntuacion_aux).data
 
 	def update(self, instance, validated_data):
 		instance.puntuacion = validated_data.get('puntuacion', instance.puntuacion)
