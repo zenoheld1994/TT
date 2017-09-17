@@ -140,3 +140,16 @@ class PuntuacionViewSet(mixins.ListModelMixin,
 	authentication_classes = [OAuth2Authentication]
 	queryset = Puntuaciones.objects.all()
 
+class EveryoneViewSet(mixins.ListModelMixin,
+	mixins.CreateModelMixin, 
+	mixins.RetrieveModelMixin,
+	viewsets.GenericViewSet):
+	serializer_class = UsuarioSerializer
+	permission_classes = [permissions.AllowAny, TokenHasReadWriteScope]
+	authentication_classes = [OAuth2Authentication]
+	queryset = Usuarios.objects.all()
+	@list_route(methods=['GET'], permission_classes=[permissions.AllowAny])
+	def getEscuelas(self, request):
+		escuelas = Escuelas.objects.all()
+		serescuelas = EscuelaSerializer(escuelas,many=True)
+		return Response(serescuelas.data)

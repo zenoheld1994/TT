@@ -17,7 +17,17 @@ from TT.settings import OAUTH2_PROVIDER,SERVER_IP,BASIC_TOKEN
 from django.contrib import messages
 # Create your views here.
 def login_page(request):
-    return render(request, 'Superadmin/login.html', {})
+	url = "http://"+SERVER_IP+"/v1/everyone/getEscuelas"
+
+	headers = {
+		'content-type': "application/json",
+		'cache-control': "no-cache",
+		'postman-token': "572188b3-a5b1-ba0d-483a-25c212ed488f"
+		}
+
+	response = requests.request("GET", url,  headers=headers)
+	schools = json.loads(response.text)
+	return render(request, 'Superadmin/login.html', {"schools":schools})
 
 def school_create(request):
 	try:
@@ -47,11 +57,11 @@ def school_save(request):
 			url = "http://"+SERVER_IP+"/v1/escuelas"
 			payload = "{\n  \"nombre\": \""+name+"\"\n}"
 			headers = {
-			    'authorization': "Bearer " +str(tokenSession),
-			    'cache-control': "no-cache",
-			    'content-type': "application/json",	
-			    'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
-			    }
+				'authorization': "Bearer " +str(tokenSession),
+				'cache-control': "no-cache",
+				'content-type': "application/json",	
+				'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
+				}
 			response = requests.request("POST", url,data=payload, headers=headers)
 			status=response.status_code
 			print(status,"aqui we")
@@ -80,10 +90,10 @@ def school_list(request):
 			try:
 				url = "http://"+SERVER_IP+"/v1/escuelas/"
 				headers = {
-				    'authorization': "Bearer " +str(tokenSession),
-				    'cache-control': "no-cache",
-				    'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
-				    }
+					'authorization': "Bearer " +str(tokenSession),
+					'cache-control': "no-cache",
+					'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
+					}
 				response = requests.request("GET", url, headers=headers)
 				schools = json.loads(response.text)
 				return render(request,'Superadmin/school_list.html' , {"SERVER_IP":SERVER_IP,"schools":schools["results"]})
@@ -107,10 +117,10 @@ def user_list(request):
 			try:
 				url = "http://"+SERVER_IP+"/v1/usuarios/"
 				headers = {
-				    'authorization': "Bearer " +str(tokenSession),
-				    'cache-control': "no-cache",
-				    'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
-				    }
+					'authorization': "Bearer " +str(tokenSession),
+					'cache-control': "no-cache",
+					'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
+					}
 				response = requests.request("GET", url, headers=headers)
 				users = json.loads(response.text)
 				return render(request,'Superadmin/user_list.html' , {"SERVER_IP":SERVER_IP,"users":users["results"]})
@@ -164,20 +174,30 @@ def loginAdminSuccess(request):
 	token_json = response.json()
 
 	userModel = get_object_or_404(UserAuth, username=username)
+	depends = False
 	try:
 		user = UserAuth.objects.get(id=userModel.id, is_superuser=1)
+		depends = True
 	except:
-		return Response({'detail': "464"}, status=status.HTTP_401_UNAUTHORIZED,
+		try:
+			user = UserAuth.objects.get(id=userModel.id)
+			usuario = Usuarios.objects.get(idUser=userModel.id,tipoUsuario=True)
+			print(usuario)
+		except:
+			return Response({'detail': "464"}, status=status.HTTP_401_UNAUTHORIZED,
 								content_type="applicationjson")
 	userAuth = authenticate(username=username,password=password)
 	login(request, userAuth)
 
+	
 	request.session['userid'] = userModel.id
 	request.session['username'] = username
 	request.session['token'] = token_json['access_token']
 
-
-	return redirect('/dashboard_admin')
+	if(depends):
+		return redirect('/dashboard_admin')
+	else:
+		return redirect('/dashboard_staff')
 def logout_view(request):
 	request.session['token'] = None
 	logout(request)

@@ -27,6 +27,7 @@ router.register(r'v1/escuelas',apiUsuarios.EscuelasViewSet,base_name='escuela')
 router.register(r'v1/grupos',apiUsuarios.GruposViewSet,base_name='grupo')
 router.register(r'v1/lecciones',apiUsuarios.LeccionViewSet,base_name='leccion')
 router.register(r'v1/puntuaciones',apiUsuarios.PuntuacionViewSet,base_name='puntuacion')
+router.register(r'v1/everyone',apiUsuarios.EveryoneViewSet,base_name='everyone')
 
 
 urlpatterns = [

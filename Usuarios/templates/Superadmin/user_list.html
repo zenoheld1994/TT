@@ -3,11 +3,8 @@
 {% load staticfiles %}
         {% block title %}TT2016-B065 | Ver listado de usuarios{% endblock %}
         {% block CSS1 %}
-            <link href="{% static 'assets/global/plugins/datatables/datatables.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/global/plugins/datatables/datatables.min.css' %}" rel="stylesheet" type="text/css" />
     <link href="{% static 'assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css' %}" rel="stylesheet" type="text/css" />
-
-    
-
     <link href="{% static 'assets/global/plugins/bootstrap-sweetalert/sweetalert.css' %}" rel="stylesheet" type="text/css" />
     {% endblock %}
 
@@ -37,8 +34,7 @@
 
                                 </div>
                                 <div class="portlet-body">
-                                    <div class="table-scrollable">
-                                        <table class="table table-hover">
+                                        <table class="table table-striped table-bordered table-hover dt-responsive" width="100%" id="sample_1">
                                             <thead>
                                                 <tr>
                                                     <th> # </th>
@@ -74,7 +70,7 @@
                                             </tbody>
                                         </table>
 
-                                    </div>
+                                    
                                 </div>
                             </div>
                             <!-- END SAMPLE TABLE PORTLET-->
