@@ -145,7 +145,6 @@ class EveryoneViewSet(mixins.ListModelMixin,
 	mixins.RetrieveModelMixin,
 	viewsets.GenericViewSet):
 	serializer_class = UsuarioSerializer
-	permission_classes = [permissions.AllowAny, TokenHasReadWriteScope]
 	authentication_classes = [OAuth2Authentication]
 	queryset = Usuarios.objects.all()
 	@list_route(methods=['GET'], permission_classes=[permissions.AllowAny])
@@ -153,3 +152,9 @@ class EveryoneViewSet(mixins.ListModelMixin,
 		escuelas = Escuelas.objects.all()
 		serescuelas = EscuelaSerializer(escuelas,many=True)
 		return Response(serescuelas.data)
+	@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
+	def createProfesor(self, request):
+		profesor = UsuarioCreateSerializer(data=request.data)
+		profesor.is_valid(raise_exception=True)
+		result = profesor.create(request.data)
+		return Response(result)

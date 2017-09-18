@@ -183,8 +183,9 @@ class GrupoSerializer(serializers.Serializer):
 		fields = ('nombre','idGrupo','idUsuario')
 	def create(self, validated_data,auxid):
 		grupo = Grupos.objects.create(**validated_data)
-		user = Usuarios.objects.get(pk=auxid)
+		user = Usuarios.objects.get(idUser=auxid)
 		user.idGrupo = grupo
+		user.save()
 		return GrupoSerializer(grupo).data
 	def update(self, instance, validated_data):
 		instance.nombre = validated_data.get('nombre', instance.nombre)

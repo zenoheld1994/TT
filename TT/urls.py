@@ -30,6 +30,7 @@ router.register(r'v1/puntuaciones',apiUsuarios.PuntuacionViewSet,base_name='punt
 router.register(r'v1/everyone',apiUsuarios.EveryoneViewSet,base_name='everyone')
 
 
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),

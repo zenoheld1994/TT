@@ -40,12 +40,29 @@
         <!-- BEGIN LOGO -->
         <div class="logo">
             <a href="index.html">
-                <img src="{% static 'assets/pages/img/logo-big.png" alt="" /> </a>
+                </a>
         </div>
         <!-- END LOGO -->
         <!-- BEGIN LOGIN -->
         <div class="content">
             <!-- BEGIN LOGIN FORM -->
+                {% if messages %}
+                        {% for message in messages %}
+                            {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %} 
+                            <div class="alert alert-success ">
+                                <button class="close" data-close="alert"></button>
+                                <span>Cuenta creada, ahora inicia sesión</span>
+                            </div>
+                            {% endif %}
+                            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %} 
+                            <div class="alert alert-success ">
+                                <button class="close" data-close="alert"></button>
+                                <span>Credenciales incorrectas</span>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                {% endif %}
+
             <form class="login-form" action="admin_successful_login" method="post">
                 <h3 class="form-title">Ingresa a tu cuenta</h3>
                 <div class="alert alert-danger display-hide">
@@ -80,7 +97,7 @@
             </form>
             <!-- END LOGIN FORM -->
             <!-- BEGIN FORGOT PASSWORD FORM -->
-            <form class="register-form" action="index.html" method="post">
+            <form class="register-form" action="login_page_create" method="post" >
                 <h3>Registro de Profesor</h3>
                 
 
@@ -90,13 +107,13 @@
                     <label class="control-label visible-ie8 visible-ie9">Nombre Completo</label>
                     <div class="input-icon">
                         <i class="fa fa-font"></i>
-                        <input class="form-control placeholder-no-fix" type="text" autocomplete="off" placeholder="Nombre Completo" name="fullname" /> </div>
+                        <input class="form-control placeholder-no-fix" type="text" autocomplete="off" placeholder="Nombre Completo" name="fullname" id="fullname" /> </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label visible-ie8 visible-ie9">Usuario</label>
                     <div class="input-icon">
                         <i class="fa fa-user"></i>
-                        <input class="form-control placeholder-no-fix" type="text" autocomplete="off" placeholder="Usuario" name="username" /> </div>
+                        <input class="form-control placeholder-no-fix" type="text" autocomplete="off" placeholder="Usuario" name="name" id="name" /> </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label visible-ie8 visible-ie9">Escuela</label>
@@ -125,7 +142,7 @@
 
                 <div class="form-actions">
                     <button id="register-back-btn" type="button" class="btn red btn-outline"> Cancelar </button>
-                    <button type="submit" id="register-submit-btn" class="btn green pull-right"> Crear </button>
+                    <button type="submit"   class="btn green pull-right"> Crear </button>
                 </div>
             </form>
             <!-- END FORGOT PASSWORD FORM -->
@@ -161,6 +178,9 @@
         <!-- END PAGE LEVEL SCRIPTS -->
         <!-- BEGIN THEME LAYOUT SCRIPTS -->
         <!-- END THEME LAYOUT SCRIPTS -->
+        <script>
+
+        </script>
     </body>
 
 </html>

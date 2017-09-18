@@ -1,0 +1,146 @@
+{% extends 'Superadmin/menu_layout_staff.html' %}
+  {% block content %}
+{% load staticfiles %}
+
+	{% block title %}Administración de Grupo{% endblock %}
+	<div class="page-head">
+    {% if createoredit %}
+		<div class="page-title">
+			<h1>Crear Grupo</h1>
+		</div>
+    </div>
+     <div class="row">
+        <div class="col-md-12">
+                            <!-- BEGIN SAMPLE TABLE PORTLET-->
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="icon-social-dribbble font-green"></i>
+                        <span class="caption-subject font-green bold uppercase">Grupo</span>
+                    </div>
+                </div>
+        <div class="portlet-body">
+            <form class="login-form" action="saveGroup" method="post">
+                {% if messages %}
+            		{% for message in messages %}
+            			{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+
+		            	<div class="alert alert-danger ">
+		                    <button class="close" data-close="alert"></button>
+		                    <span>El nombre del grupo esta repetido, use otro.</span>
+		                </div>
+		                {% endif %}
+	                {% endfor %}
+                {% endif %}
+                <div class="form-group col-md-offset-4">
+                    <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
+                    <label class="control-label ">Nombre del Grupo</label>
+                    <div class="input-icon">
+                        <i class="fa fa-graduation-cap"></i>
+                        <input class="form-control placeholder-no-fix" style="width: 40%;" type="text" autocomplete="off" placeholder="Ej: 6A, 6°A, sexto A" name="group_name" id="group_name" /> </div>
+                        <br>
+                        <button type="submit" class="btn green "> Crear </button>
+                        <br>
+                </div>
+            </form>
+                            </div>
+                            <!-- END SAMPLE TABLE PORTLET-->
+                        </div>
+                        
+                    </div>
+            </div>
+            
+        {% else %} 
+            <div class="page-title">
+            <h1>Editar Grupo</h1>
+        </div>
+    </div>
+     <div class="row">
+        <div class="col-md-12">
+                            <!-- BEGIN SAMPLE TABLE PORTLET-->
+            <div class="portlet light bordered">
+                <div class="portlet-title">
+                    <div class="caption">
+                        <i class="icon-social-dribbble font-green"></i>
+                        <span class="caption-subject font-green bold uppercase">Grupo</span>
+                    </div>
+
+                </div>
+        <div class="portlet-body">
+            <form class="login-form"  method="post">
+
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+
+                        <div class="alert alert-success ">
+                            <button class="close" data-close="alert"></button>
+                            <span>Grupo creado</span>
+                        </div>
+
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+
+                        <div class="alert alert-danger ">
+                            <button class="close" data-close="alert"></button>
+                            <span>El nombre de la escuela esta repetido, use otro.</span>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            
+                <div class="form-group col-md-offset-4">
+                    <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
+                    <label class="control-label ">Nombre del grupo</label>
+                    <div class="input-icon">
+
+                        <i class="fa fa-graduation-cap"></i>
+
+                        <input class="form-control placeholder-no-fix" style="width: 40%;" type="text" autocomplete="off" placeholder="Ej: 6A, 6°A, sexto A" name="group_name" id="group_name" required value="{{group.nombre}}"/> </div>
+                        <br>
+
+                        <button type="button" class="btn green " onclick="editgroup()"> Editar </button>
+                        <br>
+                </div>
+            </form>
+                            </div>
+                            <!-- END SAMPLE TABLE PORTLET-->
+                        </div>     
+                    </div>
+            </div>
+        {% endif %}   
+	{% block js_2 %}
+	<script type="text/javascript">
+		var set_active = document.getElementById("editGroup");
+		set_active.className += " active";
+		set_active.className += " open";
+        
+        var token = '{{request.session.token}}'
+        function editgroup(){
+        var name = document.getElementById("group_name").value;
+        var settings = {
+              "async": true,
+              "crossDomain": true,
+              "url": "http://"+"{{SERVER_IP}}"+"/v1/grupos/"+"{{group.idGrupo}}",
+              "method": "PATCH",
+              "headers": {
+                "content-type": "application/json",
+                "authorization": "Bearer "+token,
+                "cache-control": "no-cache",
+                "postman-token": "d20f886d-0f70-a8ad-29fe-698d5e841512"
+              },
+              "processData": false,
+              "data": "{\n    \"nombre\": \""+name+"\"\n}"
+            }
+
+            $.ajax(settings).done(function (response) {
+              success:location.reload();
+            });
+        }
+	</script>
+	{% endblock %}
+{% endblock %}   

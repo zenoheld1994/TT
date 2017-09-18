@@ -10,4 +10,8 @@ urlpatterns = [
 	url(r'^schoolCreate$', views.school_create),
 	url(r'^saveSchool$', views.school_save),
 	url(r'^schoolList$', views.school_list),
+	url(r'^login_page_create$', views.profesor_create),
+	url(r'^dashboard_staff$', views.dashboardStaff),
+	url(r'^editGroup$', views.group_admin),
+	url(r'^saveGroup$', views.group_save),
 ]
