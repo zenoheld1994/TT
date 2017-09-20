@@ -131,7 +131,7 @@ def school_list(request):
 					}
 				response = requests.request("GET", url, headers=headers)
 				schools = json.loads(response.text)
-				return render(request,'Superadmin/school_list.html' , {"SERVER_IP":SERVER_IP,"schools":schools["results"]})
+				return render(request,'Superadmin/school_list.html' , {"SERVER_IP":SERVER_IP,"schools":schools})
 			except:
 				return render(request, 'Superadmin/Unauthorized.html', {})
 	except:

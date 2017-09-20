@@ -51,7 +51,9 @@
                                                     <td id="{{school.idEscuela}}">{{school.nombre}}</td>
                                                     
                                                     <td id="{{school.idEscuela}}">
-                                                        <button class="btn delete yellow btn-outline" onclick="editSchool('{{school.idEscuela}}')"><i class="fa fa-close"></i> Editar</button>
+
+                                                        <button class="btn btn-outline  purple" data-toggle="modal" href="#editSchool" onclick="setdata('{{school.idEscuela}}')"><i class="fa fa-edit"></i> Editar</button>
+
                                                     </td>
                                                     <td id="{{school.idEscuela}}">
                                                     
@@ -71,7 +73,62 @@
                         </div>
                         
                     </div>
-                    
+<div id="editSchool" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title caption-subject font-green sbold uppercase">Editar Escuela</h4>
+            </div>
+            <div class="modal-body">
+                <div class="scroller" style="height:310px" data-always-visible="1" data-rail-visible1="1">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- BEGIN VALIDATION STATES-->
+                            <div class="portlet light portlet-fit portlet-form bordered">
+
+                                <div class="portlet-body">
+                                    <!-- BEGIN FORM-->
+                                    <form action="#" class="form-horizontal" id="form_sample_2">
+                                        <div class="form-body">
+                                            <div class="form-group form-md-line-input">
+                                                <label class="col-md-3 control-label" for="form_control_2">ID</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control" placeholder="" id="ID" name="ID" disabled>
+                                                    <div class="form-control-focus"> </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group form-md-line-input">
+                                                <label class="col-md-3 control-label" for="form_control_2">Nombre de escuela</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" class="form-control" placeholder="" id="school_name" name="name">
+                                                    <div class="form-control-focus"> </div>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="form-actions">
+                                            <div class="row" style="text-align: right;">
+                                                <div class="col-md-offset-3 col-md-9">
+                                                    <button type="button" data-dismiss="modal" class="btn btn-outline dark">Close</button>
+                                                    <a href="javascript:;" class="btn green" onclick="editSchool()">Submit</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                    <!-- END FORM-->
+                                </div>
+                            </div>
+                            <!-- END VALIDATION STATES-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
                     
                     
                     
@@ -121,6 +178,81 @@
         var set_active = document.getElementById("schoolList");
         set_active.className += " active";
         set_active.className += " open";
+
+        function setdata(id){
+            var token = '{{request.session.token}}';
+            var settings = {
+              "async": true,
+              "crossDomain": true,
+              "url": "http://"+"{{SERVER_IP}}"+"/v1/escuelas/"+id,
+              "method": "GET",
+              "headers": {
+                "authorization": "Bearer "+token,
+                "cache-control": "no-cache",
+                "postman-token": "52e31e9d-a4ae-3b0a-e3e1-b8fc2fb8ee9f"
+              }
+            }
+
+            $.ajax(settings).done(function (response) {
+              console.log(response);
+              document.getElementById("ID").value=response['idEscuela'];
+              document.getElementById("school_name").value=response['nombre'];
+            });
+        }
+        function editSchool(){
+
+            var name = document.getElementById('school_name').value;
+            var id = document.getElementById('ID').value;
+            var token = '{{request.session.token}}';    
+
+                $('#editSchool').modal('hide');
+
+                swal({
+                      title: "¿Estás seguro que quieres editar la escuela?",
+                      text: "Editar Escuela",
+                      type: "warning",
+                      showCancelButton: true,
+                      confirmButtonColor: "#DD6B55",
+                      confirmButtonText: "Editar",
+                      closeOnConfirm: false
+                    },
+                    function(){
+                        var settings = {
+                          "async": true,
+                          "crossDomain": true,
+                          "url": "http://"+"{{SERVER_IP}}"+"/v1/escuelas/"+id,
+                          "method": "PATCH",
+                          "headers": {
+                            "content-type": "application/json",
+                            "authorization": "Bearer " + token,
+                            "cache-control": "no-cache",
+                            "postman-token": "2e89a0f2-c8e5-be5c-9c52-c0625527a7ad"
+                          },
+                          "processData": false,
+                          "data": "{\n\t\"nombre\":\""+name+"\"\n}",
+
+                          beforeSend: function () {
+                                console.log(settings)
+                                console.log('antes');
+                            },
+                            complete: function () {
+                                swal("Editada!", "La escuela es edito correctamente.", "success");
+                                location.reload();
+                            },
+                            error: function (algo) {
+                                swal("Error", "Please fill all the fields.", "error");
+                                console.log(algo);
+                            }
+                        }
+                        console.log(settings.data);
+                        $.ajax(settings).done(function (response) {
+                          console.log(response);
+                        });
+                    });
+        }
+
+
+
         function deleteSchool(id) {
            
             
@@ -135,7 +267,7 @@
                           closeOnConfirm: false
                         },
                         function(){
-
+                                var token = '{{request.session.token}}';  
                                 var settings = {
                                   "async": true,
                                   "crossDomain": true,
@@ -143,7 +275,7 @@
                                   "method": "DELETE",
                                   "headers": {
                                     "content-type": "application/json",
-                                    "authorization": "Bearer " + "AgXAJlRVIq2fYYGmCVZ2GEJ5j5eNhE",
+                                    "authorization": "Bearer " + token,
                                     "cache-control": "no-cache",
                                     "postman-token": "2e89a0f2-c8e5-be5c-9c52-c0625527a7ad"
                                   },
