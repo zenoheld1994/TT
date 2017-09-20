@@ -114,7 +114,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'oauth2_provider.ext.rest_framework.OAuth2Authentication', 
     ),
-    'PAGE_SIZE': 10,
+    
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 '''
@@ -129,7 +129,7 @@ REST_FRAMEWORK = {
 
 LANGUAGE_CODE = 'en-us'
 
-DEFAULT_CHARSET='latin1'
+DEFAULT_CHARSET='utf-8'
 
 TIME_ZONE = 'UTC'
 
