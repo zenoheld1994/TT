@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from rest_framework import viewsets, status, mixins, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, \
