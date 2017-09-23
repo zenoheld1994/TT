@@ -51,10 +51,11 @@ def school_create(request):
 @csrf_exempt
 def school_save(request):
 	name=request.POST['school_name']
+	name2= name.encode('utf8')
+	name = name2
 	tokenSession = AccessToken.objects.get(token=request.session['token'])
 	usuario = request.session['userid']
 	if timezone.now() > tokenSession.expires:
-		#print("ERRROR1")
 		request.session['token'] = None
 		return redirect('/logout_admin')
 	else:
@@ -63,8 +64,7 @@ def school_save(request):
 			headers = {
 				'authorization': "Bearer " +str(tokenSession),
 				'cache-control': "no-cache",
-				'content-type': "application/json",	
-				'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
+				'content-type': "application/json"
 				}
 			response = requests.request("POST", url,data=payload, headers=headers)
 			status=response.status_code
