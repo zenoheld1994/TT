@@ -15,7 +15,7 @@ class Grupos(models.Model):
 	class Meta:
 		db_table = "Grupos"
 	idGrupo = models.AutoField(primary_key=True)
-	nombre = models.CharField(max_length=30,blank=False,unique=True)
+	nombre = models.CharField(max_length=30,blank=False,unique=False)
 class Usuarios(models.Model):
 	class Meta:
 		db_table = "Usuarios"

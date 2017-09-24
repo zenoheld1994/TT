@@ -6,7 +6,7 @@
 	<div class="page-head">
     {% if createoredit %}
 		<div class="page-title">
-			<h1>Crear Grupo</h1>
+			<h1>Crear grupo</h1>
 		</div>
     </div>
      <div class="row">
@@ -22,12 +22,24 @@
         <div class="portlet-body">
             <form class="login-form" action="saveGroup" method="post">
                 {% if messages %}
+                    {% for message in messages %}
+                        {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+
+                        <div class="alert alert-success ">
+                            <button class="close" data-close="alert"></button>
+                            <span>Grupo creado</span>
+                        </div>
+
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                {% if messages %}
             		{% for message in messages %}
             			{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
 
 		            	<div class="alert alert-danger ">
 		                    <button class="close" data-close="alert"></button>
-		                    <span>El nombre del grupo esta repetido, use otro.</span>
+		                    <span>El nombre de grupo .</span>
 		                </div>
 		                {% endif %}
 	                {% endfor %}
