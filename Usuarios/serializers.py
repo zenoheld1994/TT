@@ -74,11 +74,11 @@ class UsuarioCreateSerializer(serializers.Serializer):
 		model = Usuarios
 		fields = ('tipoUsuario','usuario','contrasena','nombre','idEscuela')
 	def validate_contrasena(self,value):
-		algo = re.match('\w{8}',value)
+		algo = re.match('\w{5}',value)
 		if algo:
 		   return value
 		else:
-			raise serializers.ValidationError("Password's length must be at least 8 characters")
+			raise serializers.ValidationError("Password's length must be at least 5 characters")
 	def validate_usuario(self,value):
 		if UserAuth.objects.filter(username=value).exists():
 			raise serializers.ValidationError("Username already exists")
