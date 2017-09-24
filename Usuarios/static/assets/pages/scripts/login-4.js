@@ -19,10 +19,10 @@ var Login = function () {
 
 	            messages: {
 	                username: {
-	                    required: "Username is required."
+	                    required: "Este campo es obligatorio"
 	                },
 	                password: {
-	                    required: "Password is required."
+	                    required: "Este campo es obligatorio."
 	                }
 	            },
 
@@ -178,8 +178,12 @@ var Login = function () {
 	                username: {
 	                    required: true
 	                },
+	                name:{
+	                	required: true	
+	                }
 	                password: {
-	                    required: true
+	                    required: true,
+	                    minlength:5
 	                },
 	                rpassword: {
 	                    equalTo: "#register_password"

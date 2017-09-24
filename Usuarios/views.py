@@ -82,7 +82,7 @@ def school_save(request):
 @csrf_exempt
 def profesor_create(request):
 	name=(request.POST['fullname']).encode('utf8')
-	user=(request.POST['name']).encode('utf8')
+	user=(request.POST['address']).encode('utf8')
 	school=request.POST['country']
 	password=request.POST['password']
 	url = "http://"+SERVER_IP+"/v1/everyone/createProfesor"
