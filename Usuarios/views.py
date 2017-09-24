@@ -81,8 +81,8 @@ def school_save(request):
 
 @csrf_exempt
 def profesor_create(request):
-	name=request.POST['fullname']
-	user=request.POST['name']
+	name=(request.POST['fullname']).encode('utf8')
+	user=(request.POST['name']).encode('utf8')
 	school=request.POST['country']
 	password=request.POST['password']
 	url = "http://"+SERVER_IP+"/v1/everyone/createProfesor"
@@ -94,7 +94,7 @@ def profesor_create(request):
 		}
 	response = requests.request("POST", url,data=payload, headers=headers)
 	status=response.status_code
-
+	print(status)
 
 	url2 = "http://"+SERVER_IP+"/v1/everyone/getEscuelas"
 
@@ -133,6 +133,7 @@ def school_list(request):
 					}
 				response = requests.request("GET", url, headers=headers)
 				schools = json.loads(response.text)
+				print(schools)
 				return render(request,'Superadmin/school_list.html' , {"SERVER_IP":SERVER_IP,"schools":schools})
 			except:
 				return render(request, 'Superadmin/Unauthorized.html', {})
@@ -147,7 +148,6 @@ def user_list(request):
 		tokenSession = AccessToken.objects.get(token=request.session['token'])
 		usuario = request.session['userid']
 		if timezone.now() > tokenSession.expires:
-			#print("ERRROR1")
 			request.session['token'] = None
 			return redirect('/logout_admin')
 		else:
@@ -160,7 +160,7 @@ def user_list(request):
 					}
 				response = requests.request("GET", url, headers=headers)
 				users = json.loads(response.text)
-				return render(request,'Superadmin/user_list.html' , {"SERVER_IP":SERVER_IP,"users":users["results"]})
+				return render(request,'Superadmin/user_list.html' , {"SERVER_IP":SERVER_IP,"users":users})
 			except:
 				return render(request, 'Superadmin/Unauthorized.html', {})
 	except:
