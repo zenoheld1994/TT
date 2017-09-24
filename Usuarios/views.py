@@ -294,13 +294,20 @@ def loginAdminSuccess(request):
 		except:
 			messages.error(request, 'ERROR')
 			return redirect('/login_page')
-	userAuth = authenticate(username=username,password=password)
-	login(request, userAuth)
-
+	try:
+		userAuth = authenticate(username=username,password=password)
+		login(request, userAuth)
+	except:
+		messages.error(request, 'ERROR')
+		return redirect('/login_page')
+	try:
 	
-	request.session['userid'] = userModel.id
-	request.session['username'] = username
-	request.session['token'] = token_json['access_token']
+		request.session['userid'] = userModel.id
+		request.session['username'] = username
+		request.session['token'] = token_json['access_token']
+	except:
+		messages.error(request, 'ERROR')
+		return redirect('/login_page')
 
 	if(depends):
 		return redirect('/dashboard_admin')

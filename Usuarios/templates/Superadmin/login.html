@@ -55,9 +55,9 @@
                             </div>
                             {% endif %}
                             {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %} 
-                            <div class="alert alert-success ">
+                            <div class="alert alert-danger ">
                                 <button class="close" data-close="alert"></button>
-                                <span>Credenciales incorrectas</span>
+                                <span>El usuario o contraseña son incorrectas</span>
                             </div>
                             {% endif %}
                         {% endfor %}
