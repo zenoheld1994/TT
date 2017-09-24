@@ -111,8 +111,8 @@
                                         <div class="form-actions">
                                             <div class="row" style="text-align: right;">
                                                 <div class="col-md-offset-3 col-md-9">
-                                                    <button type="button" data-dismiss="modal" class="btn btn-outline dark">Close</button>
-                                                    <a href="javascript:;" class="btn green" onclick="editSchool()">Submit</a>
+                                                    <button type="button" data-dismiss="modal" class="btn btn-outline dark">Cancelar</button>
+                                                    <a href="javascript:;" class="btn green" onclick="editSchool()">Editar</a>
                                                 </div>
                                             </div>
                                         </div>
@@ -208,8 +208,8 @@
                 $('#editSchool').modal('hide');
 
                 swal({
-                      title: "¿Estás seguro que quieres editar la escuela?",
-                      text: "Editar Escuela",
+                      title: "¿Deseas realizar esta operación?",
+                      text: "",
                       type: "warning",
                       showCancelButton: true,
                       confirmButtonColor: "#DD6B55",
@@ -258,12 +258,12 @@
             
 
             swal({
-                          title: "¿Estás seguro?",
-                          text: "Eliminaras una escuela",
+                          title: "¿Deseas realizar esta operación?",
+                          text: "",
                           type: "warning",
                           showCancelButton: true,
                           confirmButtonColor: "#DD6B55",
-                          confirmButtonText: "Eliminar!",
+                          confirmButtonText: "Eliminar",
                           closeOnConfirm: false
                         },
                         function(){

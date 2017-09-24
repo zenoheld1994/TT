@@ -124,7 +124,7 @@
         set_active.className += " active";
      
         function deleteUser(id) {
-           
+           var token = '{{request.session.token}}';
             
 
             swal({
@@ -145,7 +145,7 @@
                                   "method": "DELETE",
                                   "headers": {
                                     "content-type": "application/json",
-                                    "authorization": "Bearer " + "AgXAJlRVIq2fYYGmCVZ2GEJ5j5eNhE",
+                                    "authorization": "Bearer " + token,
                                     "cache-control": "no-cache",
                                     "postman-token": "2e89a0f2-c8e5-be5c-9c52-c0625527a7ad"
                                   },
@@ -156,7 +156,7 @@
                                         console.log('antes');
                                     },
                                     complete: function () {
-                                        swal("Eliminado!", "El usuario ha sido eliminado", "success");
+                                        swal("Eliminado", "El usuario ha sido eliminado", "success");
                                         location.reload();
                                     },
                                     error: function (algo) {
