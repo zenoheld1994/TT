@@ -229,7 +229,6 @@ def group_admin(request):
 				createoredit=True
 				return render(request, 'Superadmin/group_edit.html', {"createoredit":createoredit})
 	except:
-		print("valio verga")
 		return redirect('/logout_admin')
 
 @csrf_exempt
