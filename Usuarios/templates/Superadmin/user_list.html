@@ -141,7 +141,7 @@
                                 var settings = {
                                   "async": true,
                                   "crossDomain": true,
-                                  "url": "http://localhost:5000/v1/usuarios/"+id,
+                                  "url": "http://"+"{{SERVER_IP}}"+"/v1/usuarios/"+id,
                                   "method": "DELETE",
                                   "headers": {
                                     "content-type": "application/json",
