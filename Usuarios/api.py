@@ -19,6 +19,8 @@ from django.http import HttpResponse
 import json 
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import logout
+from TT.settings import OAUTH2_PROVIDER,SERVER_IP,BASIC_TOKEN
+import requests
 class SuperAdminPermission(permissions.BasePermission):
     def has_permission(self, request, view):
         idp = request.user.pk
@@ -78,7 +80,25 @@ class UsuariosViewSet(mixins.ListModelMixin,
 					login(request, userAuth)
 					resp = Usuarios.objects.get(idUser=userModel.id)
 					serResp = UsuarioSerializer(resp).data
+					#peticion token
+					print("quiebro")
+					username=valid.get('usuario')
+					password=valid.get('contrasena')
+					url = "http://"+SERVER_IP + "/o/token/"
+					payload = "grant_type=password&password="+password+"&username="+username
+					headers = {
+					'content-type': "application/x-www-form-urlencoded",
+					'authorization': "Basic "+BASIC_TOKEN,
+					'cache-control': "no-cache",
+					'postman-token': "cba85345-7c4f-f0fc-c3f3-f2e86bfca26c"
+					}
+					try:
+						response = requests.request("POST", url, data=payload, headers=headers)
+					except:
+						return Response({'detail': "461"}, status=status.HTTP_401_UNAUTHORIZED)
 
+					token_json = response.json()
+					serResp["token"] = token_json["access_token"]
 					return Response(serResp)
 				else:
 					return Response({'detail': "461"}, status=status.HTTP_401_UNAUTHORIZED)
