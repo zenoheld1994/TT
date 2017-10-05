@@ -59,7 +59,6 @@ class UsuariosViewSet(mixins.ListModelMixin,
 	@csrf_exempt
 	@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
 	def login(self, request):
-		print(request.data)
 		serializer = UsuarioLoginSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		valid = serializer.validated_data
@@ -67,11 +66,13 @@ class UsuariosViewSet(mixins.ListModelMixin,
 			userModel = get_object_or_404(UserAuth, username=valid.get('usuario'))
 			if userModel.is_active:
 				try:
+					
 					user = UserAuth.objects.get(id=userModel.id)
 				except:
 					return Response({'detail': "464"}, status=status.HTTP_401_UNAUTHORIZED,
 								content_type="applicationjson")
-				userAuth = authenticate(username=userModel.username,
+
+				userAuth = authenticate(username=valid.get('usuario'),
 										password=valid.get('contrasena'))
 				if userAuth is not None:
 					login(request, userAuth)

@@ -43,6 +43,7 @@ def school_create(request):
 			return redirect('/logout_admin')
 		else:
 			try:
+				user = UserAuth.objects.get(id=usuario,is_superuser=True)
 				return render(request, 'Superadmin/school_create.html', {})
 			except:
 				return render(request, 'Superadmin/Unauthorized.html', {},status=403)
@@ -59,6 +60,8 @@ def school_save(request):
 		request.session['token'] = None
 		return redirect('/logout_admin')
 	else:
+		try:
+			user = UserAuth.objects.get(id=usuario,is_superuser=True)
 			url = "http://"+SERVER_IP+"/v1/escuelas"
 			payload = "{\n  \"nombre\": \""+name+"\"\n}"
 			headers = {
@@ -77,12 +80,14 @@ def school_save(request):
 					return redirect('/schoolCreate')
 			except:
 				return render(request, 'Superadmin/Unauthorized.html', {})
+		except:
+			return render(request, 'Superadmin/Unauthorized.html', {})
 	return redirect('/logout_admin')
 
 @csrf_exempt
 def profesor_create(request):
-	name=(request.POST['fullname']).encode('utf8')
-	user=(request.POST['address']).encode('utf8')
+	name=(request.POST['fullname'])
+	user=(request.POST['address'])
 	school=request.POST['country']
 	password=request.POST['password']
 	url = "http://"+SERVER_IP+"/v1/everyone/createProfesor"
@@ -94,7 +99,6 @@ def profesor_create(request):
 		}
 	response = requests.request("POST", url,data=payload, headers=headers)
 	status=response.status_code
-	print(status)
 
 	url2 = "http://"+SERVER_IP+"/v1/everyone/getEscuelas"
 
@@ -119,12 +123,14 @@ def school_list(request):
 	try:
 		tokenSession = AccessToken.objects.get(token=request.session['token'])
 		usuario = request.session['userid']
+
 		if timezone.now() > tokenSession.expires:
 			#print("ERRROR1")
 			request.session['token'] = None
 			return redirect('/logout_admin')
 		else:
 			try:
+				user = UserAuth.objects.get(id=usuario,is_superuser=True)
 				url = "http://"+SERVER_IP+"/v1/escuelas/"
 				headers = {
 					'authorization': "Bearer " +str(tokenSession),
@@ -152,6 +158,7 @@ def user_list(request):
 			return redirect('/logout_admin')
 		else:
 			try:
+				user = UserAuth.objects.get(id=usuario,is_superuser=True)
 				url = "http://"+SERVER_IP+"/v1/usuarios/"
 				headers = {
 					'authorization': "Bearer " +str(tokenSession),
@@ -160,6 +167,7 @@ def user_list(request):
 					}
 				response = requests.request("GET", url, headers=headers)
 				users = json.loads(response.text)
+
 				return render(request,'Superadmin/user_list.html' , {"SERVER_IP":SERVER_IP,"users":users})
 			except:
 				return render(request, 'Superadmin/Unauthorized.html', {})
@@ -179,6 +187,7 @@ def dashboardAdmin(request):
 		else:
 			if ID:
 				try:
+					user = UserAuth.objects.get(id=usuario,is_superuser=True)
 					request.session['userid']
 					username = request.session['username']
 					return render(request, 'Superadmin/Welcome.html', {"username":username})
@@ -187,7 +196,6 @@ def dashboardAdmin(request):
 			else:
 				return redirect('/logout_admin')
 	except:
-		print('Token not found')
 		return redirect('/logout_admin')
 #Lo de staff
 def dashboardStaff(request):
@@ -259,6 +267,33 @@ def group_save(request):
 				return redirect('/editGroup')
 			return render(request, 'Superadmin/Unauthorized.html', {})
 	return redirect('/logout_admin')
+
+def school_list(request):
+	try:
+		tokenSession = AccessToken.objects.get(token=request.session['token'])
+		usuario = request.session['userid']
+
+		if timezone.now() > tokenSession.expires:
+			#print("ERRROR1")
+			request.session['token'] = None
+			return redirect('/logout_admin')
+		else:
+			try:
+				user = UserAuth.objects.get(id=usuario,is_superuser=True)
+				url = "http://"+SERVER_IP+"/v1/escuelas/"
+				headers = {
+					'authorization': "Bearer " +str(tokenSession),
+					'cache-control': "no-cache",
+					'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
+					}
+				response = requests.request("GET", url, headers=headers)
+				schools = json.loads(response.text)
+				print(schools)
+				return render(request,'Superadmin/school_list.html' , {"SERVER_IP":SERVER_IP,"schools":schools})
+			except:
+				return render(request, 'Superadmin/Unauthorized.html', {})
+	except:
+		return redirect('/logout_admin')
 
 #####################################
 @csrf_exempt
