@@ -39,7 +39,7 @@ var ComponentsDropdowns = function () {
             return "<img class='flag' src='" + App.getGlobalImgPath() + "flags/" + state.id.toLowerCase() + ".png'/>&nbsp;&nbsp;" + state.text;
         }
         $("#select2_sample4").select2({
-            placeholder: "Select a Country",
+            placeholder: "Selecciona una escuela",
             allowClear: true,
             formatResult: format,
             formatSelection: format,

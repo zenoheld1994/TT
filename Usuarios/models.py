@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from django.db import models
 class Escuelas(models.Model):
 	class Meta:
@@ -13,7 +15,7 @@ class Grupos(models.Model):
 	class Meta:
 		db_table = "Grupos"
 	idGrupo = models.AutoField(primary_key=True)
-	nombre = models.CharField(max_length=30,blank=False,unique=True)
+	nombre = models.CharField(max_length=30,blank=False,unique=False)
 class Usuarios(models.Model):
 	class Meta:
 		db_table = "Usuarios"

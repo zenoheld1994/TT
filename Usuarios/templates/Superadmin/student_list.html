@@ -13,7 +13,7 @@
                     <div class="page-head">
                         <!-- BEGIN PAGE TITLE -->
                         <div class="page-title">
-                            <h1>Ver listado de usuarios
+                            <h1>Ver listado de alumnos
                                 
                             </h1>
                         </div>
@@ -22,13 +22,14 @@
                     </div>
                     <!-- END PAGE HEAD-->
                     <!-- BEGIN PAGE BASE CONTENT -->
+                    {% if hasgroup %}
                     <div class="row">
                         <div class="col-md-12">
                             <!-- BEGIN SAMPLE TABLE PORTLET-->
                             <div class="portlet light bordered">
                                 <div class="portlet-title">
                                     <div class="caption">
-                                        <i class="icon-users font-green"></i>
+                                        <i class="icon-social-dribbble font-green"></i>
                                         <span class="caption-subject font-green bold uppercase">Usuarios</span>
                                     </div>
 
@@ -38,11 +39,9 @@
                                             <thead>
                                                 <tr>
                                                     <th> # </th>
+                                                    <th> Alumno </th>
                                                     <th> Usuario </th>
                                                     <th> Grupo </th>
-                                                    <th> Tipo de<br> Usuario </th>
-                                                    <th> Escuela </th>
-                                                    <th> Eliminar </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -51,16 +50,7 @@
                                                 <tr>
                                                     <td id="{{user.idUsuario}}">{{user.idUsuario}}</td>
                                                     <td id="{{user.idUsuario}}">{{user.usuario}}</td>
-                                                    <td id="{{user.idUsuario}}">{{user.nombreGrupo}}</td>
-                                                    {% if user.tipoUsuario %}
-                                                    <td id="{{user.idUsuario}}">Profesor</td>
-                                                    {% else %}
-                                                    <td id="{{user.idUsuario}}">Alumno</td>
-                                                    {% endif %}
-                                                    <td id="{{user.idUsuario}}">{{user.nombreEscuela}}</td>
-                                                    <td id="{{user.idUsuario}}">
-                                                    
-
+                                                    <td id="{{user.idUsuario}}">{{user.idGrupo}}</td>
 
                                                     <button class="btn delete red btn-outline" onclick="deleteUser('{{user.idUsuario}}')"><i class="fa fa-close"></i> Eliminar</button>
 
@@ -78,7 +68,7 @@
                         
                     </div>
                     
-                    
+                    {% endif %}
                     
                     
                     
@@ -124,16 +114,16 @@
         set_active.className += " active";
      
         function deleteUser(id) {
-           var token = '{{request.session.token}}';
+           
             
 
             swal({
-                          title: "¿Desea realizar esta operación?",
-                          text: "",
+                          title: "¿Estás seguro?",
+                          text: "Eliminaras un usuario",
                           type: "warning",
                           showCancelButton: true,
                           confirmButtonColor: "#DD6B55",
-                          confirmButtonText: "Eliminar",
+                          confirmButtonText: "Borrarlo!",
                           closeOnConfirm: false
                         },
                         function(){
@@ -141,11 +131,11 @@
                                 var settings = {
                                   "async": true,
                                   "crossDomain": true,
-                                  "url": "http://"+"{{SERVER_IP}}"+"/v1/usuarios/"+id,
+                                  "url": "http://localhost:5000/v1/usuarios/"+id,
                                   "method": "DELETE",
                                   "headers": {
                                     "content-type": "application/json",
-                                    "authorization": "Bearer " + token,
+                                    "authorization": "Bearer " + "AgXAJlRVIq2fYYGmCVZ2GEJ5j5eNhE",
                                     "cache-control": "no-cache",
                                     "postman-token": "2e89a0f2-c8e5-be5c-9c52-c0625527a7ad"
                                   },
@@ -156,7 +146,7 @@
                                         console.log('antes');
                                     },
                                     complete: function () {
-                                        swal("Eliminado", "El usuario ha sido eliminado", "success");
+                                        swal("Eliminado!", "El usuario ha sido eliminado", "success");
                                         location.reload();
                                     },
                                     error: function (algo) {
