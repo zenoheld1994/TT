@@ -18,6 +18,7 @@ from oauth2_provider.models import AccessToken
 from TT.settings import OAUTH2_PROVIDER,SERVER_IP,BASIC_TOKEN
 from django.contrib import messages
 from .models import Usuarios,Grupos
+from datetime import datetime
 # Create your views here.
 @csrf_exempt
 def login_page(request):
@@ -30,9 +31,17 @@ def login_page(request):
 		}
 
 	response = requests.request("GET", url,  headers=headers)
+	response.encoding = 'UTF-8'
 	schools = json.loads(response.text)
-	return render(request, 'Superadmin/login.html', {"schools":schools,"SERVER_IP":SERVER_IP})
+	yearofdate = datetime.today().year
+	monthtodate = datetime.today().month
+	if(monthtodate>=8):
+		ciclo =  str(yearofdate)+"-"+str(yearofdate+1)
+	else:
+		ciclo =  str(yearofdate-1)+"-"+str(yearofdate)
+	return render(request, 'Superadmin/login.html', {"schools":schools,"SERVER_IP":SERVER_IP,"ciclo":ciclo})
 
+'''
 def school_create(request):
 	try:
 		tokenSession = AccessToken.objects.get(token=request.session['token'])
@@ -83,7 +92,7 @@ def school_save(request):
 		except:
 			return render(request, 'Superadmin/Unauthorized.html', {})
 	return redirect('/logout_admin')
-
+'''
 @csrf_exempt
 def profesor_create(request):
 	name=(request.POST['fullname'])
@@ -138,8 +147,9 @@ def school_list(request):
 					'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
 					}
 				response = requests.request("GET", url, headers=headers)
+				response.encoding = 'UTF-8'
 				schools = json.loads(response.text)
-				print(schools)
+				
 				return render(request,'Superadmin/school_list.html' , {"SERVER_IP":SERVER_IP,"schools":schools})
 			except:
 				return render(request, 'Superadmin/Unauthorized.html', {})
@@ -166,6 +176,7 @@ def user_list(request):
 					'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
 					}
 				response = requests.request("GET", url, headers=headers)
+				response.encoding = 'UTF-8'
 				users = json.loads(response.text)
 
 				return render(request,'Superadmin/user_list.html' , {"SERVER_IP":SERVER_IP,"users":users})
@@ -177,7 +188,6 @@ def user_list(request):
 
 def dashboardAdmin(request):
 	
-	
 	try:
 		tokenSession = AccessToken.objects.get(token=request.session['token'])
 		ID = request.session['userid']
@@ -187,7 +197,7 @@ def dashboardAdmin(request):
 		else:
 			if ID:
 				try:
-					user = UserAuth.objects.get(id=usuario,is_superuser=True)
+					user = UserAuth.objects.get(id=ID,is_superuser=True)
 					request.session['userid']
 					username = request.session['username']
 					return render(request, 'Superadmin/Welcome.html', {"username":username})
@@ -208,6 +218,7 @@ def dashboardStaff(request):
 		else:
 			if ID:
 				try:
+					user = UserAuth.objects.get(id=ID,is_superuser=True)
 					request.session['userid']
 					username = request.session['username']
 					return render(request, 'Superadmin/Welcome_staff.html', {"username":username})
@@ -218,6 +229,28 @@ def dashboardStaff(request):
 	except:
 		print('Token not found')
 		return redirect('/logout_admin')
+def dashboardStudent(request):
+	try:
+		tokenSession = AccessToken.objects.get(token=request.session['token'])
+		ID = request.session['userid']
+		if timezone.now() > tokenSession.expires:
+			request.session['token'] = None
+			return redirect('/logout_admin')
+		else:
+			if ID:
+				try:
+					user = Usuarios.objects.get(idUser=ID,tipoUsuario=False)
+					request.session['userid']
+					username = request.session['username']
+					return render(request, 'Superadmin/Welcome_student.html', {"username":username})
+				except:
+					return render(request, 'Unauthorized.html', {})
+			else:
+				return redirect('/logout_admin')
+	except:
+		print('Token not found')
+		return redirect('/logout_admin')
+
 
 def group_admin(request):
 	try:
@@ -287,9 +320,40 @@ def school_list(request):
 					'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
 					}
 				response = requests.request("GET", url, headers=headers)
+				response.encoding = 'UTF-8'
 				schools = json.loads(response.text)
-				print(schools)
+				
 				return render(request,'Superadmin/school_list.html' , {"SERVER_IP":SERVER_IP,"schools":schools})
+			except:
+				return render(request, 'Superadmin/Unauthorized.html', {})
+	except:
+		return redirect('/logout_admin')
+def score_list(request):
+
+	try:
+		tokenSession = AccessToken.objects.get(token=request.session['token'])
+		usuario = request.session['userid']
+
+		if timezone.now() > tokenSession.expires:
+			#print("ERRROR1")
+			request.session['token'] = None
+			return redirect('/logout_admin')
+		else:
+			try:
+				user = Usuarios.objects.get(idUser=usuario,tipoUsuario=False)
+				'''
+				user = UserAuth.objects.get(id=usuario,is_superuser=True)
+				url = "http://"+SERVER_IP+"/v1/escuelas/"
+				headers = {
+					'authorization': "Bearer " +str(tokenSession),
+					'cache-control': "no-cache",
+					'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
+					}
+				response = requests.request("GET", url, headers=headers)
+				response.encoding = 'UTF-8'
+				schools = json.loads(response.text)
+				'''
+				return render(request,'Superadmin/puntuaciones_list.html' , {"SERVER_IP":SERVER_IP})
 			except:
 				return render(request, 'Superadmin/Unauthorized.html', {})
 	except:
@@ -317,17 +381,24 @@ def loginAdminSuccess(request):
 	token_json = response.json()
 
 	userModel = get_object_or_404(UserAuth, username=username)
-	depends = False
+	depends = 0
 	try:
 		user = UserAuth.objects.get(id=userModel.id, is_superuser=1)
-		depends = True
+		depends = 0
 	except:
 		try:
 			user = UserAuth.objects.get(id=userModel.id)
 			usuario = Usuarios.objects.get(idUser=userModel.id,tipoUsuario=True)
+			depends=1
 		except:
-			messages.error(request, 'ERROR')
-			return redirect('/login_page')
+			try:
+				user = UserAuth.objects.get(id=userModel.id)
+				usuario = Usuarios.objects.get(idUser=userModel.id,tipoUsuario=False)
+				depends=2
+			except:
+				messages.error(request, 'ERROR')
+				return redirect('/login_page')
+			
 	try:
 		userAuth = authenticate(username=username,password=password)
 		login(request, userAuth)
@@ -343,10 +414,12 @@ def loginAdminSuccess(request):
 		messages.error(request, 'ERROR')
 		return redirect('/login_page')
 
-	if(depends):
+	if(depends==0):
 		return redirect('/dashboard_admin')
-	else:
+	elif(depends==1):
 		return redirect('/dashboard_staff')
+	elif(depends==2):
+		return redirect('/dashboard_student')
 def logout_view(request):
 	request.session['token'] = None
 	logout(request)

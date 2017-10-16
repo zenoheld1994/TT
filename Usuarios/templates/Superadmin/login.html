@@ -8,7 +8,7 @@
 
     <head>
 
-        <meta charset="utf-8" />
+        <meta charset="UTF-8" />
         <title>TT2016-B065 | Iniciar Sesión</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta content="width=device-width, initial-scale=1" name="viewport" />
@@ -91,7 +91,12 @@
                     </div>
                     <div class="create-account">
                         <p> Crea tu cuenta &nbsp;
-                            <a href="javascript:;" id="register-btn"> Cuenta para profesores </a>
+                            <a href="javascript:;" id="register-btn" style="color: #ffff00"> Cuenta para profesores </a>
+                        </p>
+                    </div>
+                    <div class="create-account">
+                        <p> Crea tu cuenta &nbsp;
+                            <a href="javascript:;" id="register-btn-2" style="color: #ffff00"> Cuenta para alumnos </a>
                         </p>
                     </div>
 
@@ -100,7 +105,7 @@
             </form>
             <!-- END LOGIN FORM -->
             <!-- BEGIN FORGOT PASSWORD FORM -->
-            <form class="register-form" action="login_page_create" method="post" id="myform">
+            <form class="register-form" action="login_page_create" method="post" id="myform" style="display:none;">
                 <h3>Registro de Profesor</h3>
                 
 
@@ -118,6 +123,21 @@
                         <i class="fa fa-user"></i>
                         <input class="form-control placeholder-no-fix" type="text" autocomplete="off" placeholder="Usuario" name="address" id="address" /> </div>
                 </div>
+                <div class="form-group">
+                    <label class="control-label visible-ie8 visible-ie9">Grupo</label>
+                    <select name="city" id="grupo" class="select2 form-control">
+                        <option value=""></option>
+                        
+                              
+                              <option value="6A{{ciclo}}">6A {{ciclo}}</option>
+                              <option value="6B{{ciclo}}">6B {{ciclo}}</option>
+                              <option value="6C{{ciclo}}">6C {{ciclo}}</option>
+                              <option value="6D{{ciclo}}">6D {{ciclo}}</option>
+                              <option value="6E{{ciclo}}">6E {{ciclo}}</option>
+                              <option value="6F{{ciclo}}">6F {{ciclo}}</option>
+                        
+                    </select>   
+                </div>  
                 <div class="form-group">
                     <label class="control-label visible-ie8 visible-ie9">Escuela</label>
                     <select name="country" id="country_list" class="select2 form-control">
@@ -145,6 +165,72 @@
 
                 <div class="form-actions">
                     <button id="register-back-btn" type="button" class="btn red btn-outline"> Cancelar </button>
+                    <button type="submit"   class="btn green pull-right"> Crear </button>
+                </div>
+            </form>
+            <form class="register-form-2" action="login_page_create_alumno" method="post" id="myform_2" style="display:none;">
+                <h3>Registro de Alumno</h3>
+                
+
+                
+                <p> Introduce tus datos: </p>
+                <div class="form-group">
+                    <label class="control-label visible-ie8 visible-ie9">Nombre Completo</label>
+                    <div class="input-icon">
+                        <i class="fa fa-font"></i>
+                        <input class="form-control placeholder-no-fix" type="text" autocomplete="off" placeholder="Nombre Completo" name="fullname" id="fullname" /> </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label visible-ie8 visible-ie9">Usuario</label>
+                    <div class="input-icon">
+                        <i class="fa fa-user"></i>
+                        <input class="form-control placeholder-no-fix" type="text" autocomplete="off" placeholder="Usuario" name="address" id="address" /> </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label visible-ie8 visible-ie9">Escuela</label>
+                    <select name="country" id="school_list" class="select2 form-control" onchange="groups()">
+                        <option value="">
+
+
+                        {% for school in schools %}
+                              
+                              <option value="{{school.idEscuela}}">{{school.nombre}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="control-label visible-ie8 visible-ie9">Grupo</label>
+                    <select name="city" id="grupo" class="select2 form-control">
+                        <option value=""></option>
+                        
+                              
+                              <option value="6A{{ciclo}}">6A {{ciclo}}</option>
+                              <option value="6B{{ciclo}}">6B {{ciclo}}</option>
+                              <option value="6C{{ciclo}}">6C {{ciclo}}</option>
+                              <option value="6D{{ciclo}}">6D {{ciclo}}</option>
+                              <option value="6E{{ciclo}}">6E {{ciclo}}</option>
+                              <option value="6F{{ciclo}}">6F {{ciclo}}</option>
+                        
+                    </select>   
+                </div>  
+
+                <div class="form-group">
+                    <label class="control-label visible-ie8 visible-ie9">Password</label>
+                    <div class="input-icon">
+                        <i class="fa fa-lock"></i>
+                        <input class="form-control placeholder-no-fix" type="password" autocomplete="off" id="register_password" placeholder="Contraseña" name="password" /> </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label visible-ie8 visible-ie9">Re-type Your Password</label>
+                    <div class="controls">
+                        <div class="input-icon">
+                            <i class="fa fa-check"></i>
+                            <input class="form-control placeholder-no-fix" type="password" autocomplete="off" placeholder="Escribe tu contraseña nuevamente" name="rpassword" /> </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button id="register-back-btn-2" type="button" class="btn red btn-outline"> Cancelar </button>
                     <button type="submit"   class="btn green pull-right"> Crear </button>
                 </div>
             </form>
@@ -183,6 +269,25 @@
               debug: true,
               success: "valid"
             });
+            function groups(){
+            var id = document.getElementById("school_list").value;
+            var settings = {
+              "async": true,
+              "crossDomain": true,
+              "url": "http://localhost:5000/v1/everyone/getGruposbyProfesorId?id="+id,
+              "method": "GET",
+              "headers": {
+                "content-type": "application/json",
+                "cache-control": "no-cache",
+                "postman-token": "6eccf3a4-fab5-2181-6197-f0b451768179"
+              }
+              
+            }
+
+            $.ajax(settings).done(function (response) {
+              console.log(response);
+            });
+            }
 
         </script>
         <!-- END PAGE LEVEL SCRIPTS -->

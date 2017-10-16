@@ -200,6 +200,9 @@ class GrupoSerializer(serializers.Serializer):
 		instance.save()
 		return instance
 
+		
+	
+
 class LeccionSerializer(serializers.Serializer):
 	idLeccion = serializers.CharField(required=False)
 	nombre = serializers.CharField()

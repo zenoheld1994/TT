@@ -151,6 +151,8 @@ class LeccionViewSet(mixins.ListModelMixin,
 	permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
 	authentication_classes = [OAuth2Authentication]
 	queryset = Leccion.objects.all()
+	#WS que saque la leccion con el nombre y solo requira el bearer mas el id de leccion
+	
 
 class PuntuacionViewSet(mixins.ListModelMixin,
 	mixins.CreateModelMixin, 
@@ -181,3 +183,18 @@ class EveryoneViewSet(mixins.ListModelMixin,
 		profesor.is_valid(raise_exception=True)
 		result = profesor.create(request.data)
 		return Response(result)
+	@list_route(methods=['GET'], permission_classes=[permissions.AllowAny])
+	def getGruposbyProfesorId(self, request):
+		try:	
+			id=request.GET['id']
+			profesores = Usuarios.objects.filter(idEscuela=id)
+			grupos = []
+			for y in profesores:
+				grupos.append(Grupos.objects.get(idGrupo=y.idGrupo.idGrupo))
+			sergrupos = GrupoSerializer(grupos,many=True)
+			return Response(sergrupos.data)
+		except:
+			error={}
+			error['error']="ID is required or ID is none"
+			return Response(error)
+	#falta sacar grupos para profsores por escuela

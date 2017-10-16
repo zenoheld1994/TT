@@ -242,6 +242,10 @@ var Login = function () {
 	            jQuery('.login-form').hide();
 	            jQuery('.register-form').show();
 	        });
+	        jQuery('#register-btn-2').click(function () {
+	            jQuery('.login-form').hide();
+	            jQuery('.register-form-2').show();
+	        });
 
 	        jQuery('#register-back-btn').click(function () {
 	            jQuery('.login-form').show();
