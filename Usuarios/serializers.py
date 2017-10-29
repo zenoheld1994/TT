@@ -229,14 +229,14 @@ class PuntuacionAuxSerializer(serializers.Serializer):
 		return obj.idLeccion.pk
 class PuntuacionSerializer(serializers.Serializer):
 	idPuntuacion = serializers.IntegerField(required=False)
-	puntuacion = serializers.IntegerField()
-	idUsuario = serializers.IntegerField()
+	puntuacion = serializers.IntegerField(required=False)
+	#idUsuario = serializers.IntegerField()
 	idLeccion = serializers.IntegerField()
 	class Meta:
 		model = Leccion
-		fields = ('idPuntuacion','puntuacion','idUsuario','idLeccion')
-	def create(self,validated_data):
-		idUsuario_aux = Usuarios.objects.get(idUsuario=validated_data.pop('idUsuario'))
+		fields = ('idPuntuacion','puntuacion','idLeccion')
+	def create(self,validated_data,auxid):
+		idUsuario_aux = Usuarios.objects.get(idUser=auxid)
 		idLeccion_aux = Leccion.objects.get(pk=validated_data.pop('idLeccion'))
 		puntuacion_aux = Puntuaciones.objects.create(puntuacion=self.data.get('puntuacion'),idUsuario=idUsuario_aux,idLeccion=idLeccion_aux)
 		return PuntuacionAuxSerializer(puntuacion_aux).data
@@ -246,3 +246,22 @@ class PuntuacionSerializer(serializers.Serializer):
 		instance.save()
 		return instance
 
+class UserInformation(serializers.Serializer):
+	idUsuario = serializers.IntegerField(required=False)
+	class Meta:
+		model = Usuarios
+		fields = ('idUsuario',)
+	def getPuntuaciones(self,validated_data,auxid):
+		try:
+			idUsuario_aux = Usuarios.objects.get(idUser=auxid,tipoUsuario=False)
+			puntuaciones = Puntuaciones.objects.filter(idUsuario=idUsuario_aux.idUsuario)
+			return PuntuacionAuxSerializer(puntuaciones,many=True).data
+		except:
+			return "Error while retrieving data UserInformation->Método.260 Serializers"
+	def getPuntuacionesofAlumno(self,validated_data,auxid):
+		try:
+			idUsuario_aux = Usuarios.objects.get(idUsuario=auxid,tipoUsuario=False)
+			puntuaciones = Puntuaciones.objects.filter(idUsuario=idUsuario_aux.idUsuario)
+			return PuntuacionAuxSerializer(puntuaciones,many=True).data
+		except:
+			return "Error while retrieving data UserInformation->Método.267 Serializers"
