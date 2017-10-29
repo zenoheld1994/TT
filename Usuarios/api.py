@@ -26,6 +26,12 @@ class SuperAdminPermission(permissions.BasePermission):
         idp = request.user.pk
         admin = UserAuth.objects.filter(id=idp,is_superuser=True).exists()
         return admin
+class ProfesorPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        idp = request.user.pk
+        #profesor = UserAuth.objects.filter(id=idp,is_superuser=False).exists()
+        profesor = Usuarios.objects.filter(idUser=idp,tipoUsuario=True).exists()
+        return profesor
 
 class UsuariosViewSet(mixins.ListModelMixin,
 	#mixins.CreateModelMixin, 
@@ -164,6 +170,31 @@ class PuntuacionViewSet(mixins.ListModelMixin,
 	permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
 	authentication_classes = [OAuth2Authentication]
 	queryset = Puntuaciones.objects.all()
+	def create(self,request):
+		ser = PuntuacionSerializer(data=request.data)
+		ser.is_valid(raise_exception=True)
+		result = ser.create(validated_data=request.data,auxid=request.user.pk)
+		return Response(result)
+	@list_route(methods=['GET'], permission_classes=[permissions.IsAuthenticated])
+	def getPuntuacionbyAlumno(self,request):
+		ser = UserInformation(data=request.data)
+		ser.is_valid(raise_exception=True)
+		result = ser.getPuntuaciones(validated_data=request.data,auxid=request.user.pk)
+		return Response(result)
+	@list_route(methods=['GET'], permission_classes=[ProfesorPermission])
+	def getPuntuacionesforProfesor(self,request):
+		ser = UserInformation(data=request.data)
+		ser.is_valid(raise_exception=True)
+		result = ser.getPuntuacionesofAlumno(validated_data=request.data,auxid=request.user.pk)
+		return Response(result)
+	#falta el que el wey mande su id y le devuelva su puntuacion yo digo que con un get
+	'''
+	@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
+	def registerPuntuacion(self,request):
+		ser = PuntuacionSerializer(data=request.data)
+		ser.is_valid(raise_exception=True)
+		return 
+	'''
 
 class EveryoneViewSet(mixins.ListModelMixin,
 	mixins.CreateModelMixin, 
