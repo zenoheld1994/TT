@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from rest_framework import serializers
 from django.contrib.auth.models import User as UserAuth
 import re
@@ -72,11 +74,11 @@ class UsuarioCreateSerializer(serializers.Serializer):
 		model = Usuarios
 		fields = ('tipoUsuario','usuario','contrasena','nombre','idEscuela')
 	def validate_contrasena(self,value):
-		algo = re.match('\w{8}',value)
+		algo = re.match('\w{5}',value)
 		if algo:
 		   return value
 		else:
-			raise serializers.ValidationError("Password's length must be at least 8 characters")
+			raise serializers.ValidationError("Password's length must be at least 5 characters")
 	def validate_usuario(self,value):
 		if UserAuth.objects.filter(username=value).exists():
 			raise serializers.ValidationError("Username already exists")
@@ -183,8 +185,9 @@ class GrupoSerializer(serializers.Serializer):
 		fields = ('nombre','idGrupo','idUsuario')
 	def create(self, validated_data,auxid):
 		grupo = Grupos.objects.create(**validated_data)
-		user = Usuarios.objects.get(pk=auxid)
+		user = Usuarios.objects.get(idUser=auxid)
 		user.idGrupo = grupo
+		user.save()
 		return GrupoSerializer(grupo).data
 	def update(self, instance, validated_data):
 		instance.nombre = validated_data.get('nombre', instance.nombre)
@@ -197,6 +200,9 @@ class GrupoSerializer(serializers.Serializer):
 		instance.save()
 		return instance
 
+		
+	
+
 class LeccionSerializer(serializers.Serializer):
 	idLeccion = serializers.CharField(required=False)
 	nombre = serializers.CharField()
@@ -205,7 +211,7 @@ class LeccionSerializer(serializers.Serializer):
 		fields = ('nombre')
 	def create(self,validated_data):
 		return Leccion.objects.create(**validated_data)
-	def update(self, instance, validated_data):
+	def update(self, instance, validated_data):	
 		instance.nombre = validated_data.get('nombre', instance.nombre)
 		instance.save()
 		return instance
@@ -232,9 +238,8 @@ class PuntuacionSerializer(serializers.Serializer):
 	def create(self,validated_data):
 		idUsuario_aux = Usuarios.objects.get(idUsuario=validated_data.pop('idUsuario'))
 		idLeccion_aux = Leccion.objects.get(pk=validated_data.pop('idLeccion'))
-
-		return PuntuacionAuxSerializer(Puntuaciones.objects.create(**validated_data,idUsuario=idUsuario_aux,
-			idLeccion=idLeccion_aux)).data
+		puntuacion_aux = Puntuaciones.objects.create(puntuacion=self.data.get('puntuacion'),idUsuario=idUsuario_aux,idLeccion=idLeccion_aux)
+		return PuntuacionAuxSerializer(puntuacion_aux).data
 
 	def update(self, instance, validated_data):
 		instance.puntuacion = validated_data.get('puntuacion', instance.puntuacion)

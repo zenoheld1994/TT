@@ -19,10 +19,10 @@ var Login = function () {
 
 	            messages: {
 	                username: {
-	                    required: "Username is required."
+	                    required: "Este campo es obligatorio"
 	                },
 	                password: {
-	                    required: "Password is required."
+	                    required: "Este campo es obligatorio."
 	                }
 	            },
 
@@ -135,7 +135,7 @@ var Login = function () {
 
         if (jQuery().select2 && $('#country_list').size() > 0) {
             $("#country_list").select2({
-	            placeholder: '<i class="fa fa-map-marker"></i>&nbsp;Select a Country',
+	            placeholder: '<i class="fa fa-map-marker"></i>&nbsp;Selecciona una escuela',
 	            templateResult: format,
                 templateSelection: format,
                 width: 'auto', 
@@ -178,8 +178,12 @@ var Login = function () {
 	                username: {
 	                    required: true
 	                },
+	                name:{
+	                	required: true	
+	                }
 	                password: {
-	                    required: true
+	                    required: true,
+	                    minlength:5
 	                },
 	                rpassword: {
 	                    equalTo: "#register_password"
@@ -237,6 +241,10 @@ var Login = function () {
 	        jQuery('#register-btn').click(function () {
 	            jQuery('.login-form').hide();
 	            jQuery('.register-form').show();
+	        });
+	        jQuery('#register-btn-2').click(function () {
+	            jQuery('.login-form').hide();
+	            jQuery('.register-form-2').show();
 	        });
 
 	        jQuery('#register-back-btn').click(function () {

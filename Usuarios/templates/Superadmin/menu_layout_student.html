@@ -23,7 +23,7 @@ License: You must have a valid license purchased only from themeforest(the above
     <!-- BEGIN HEAD -->
 
     <head>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <meta charset="latin1" />
 
         <title>{% block title %}{% endblock %}</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -58,7 +58,8 @@ License: You must have a valid license purchased only from themeforest(the above
 
 
 
-        <link rel="shortcut icon" type="image/png" href="{% static 'assets/logos/escom.png' %}"/> </head>
+        <link rel="shortcut icon" type="image/png" href="{% static 'assets/logos/escom.png' %}"/>
+    </head>
 
 
     <body class="page-container-bg-solid page-header-fixed page-sidebar-closed-hide-logo">
@@ -107,50 +108,30 @@ License: You must have a valid license purchased only from themeforest(the above
                         <li class="nav-item start active open">
                             <a href="javascript:;" class="nav-link nav-toggle">
                                 <i class="icon-home"></i>
-                                <span class="title">Super Admin</span>
+                                <span class="title">Alumno</span>
                                 <span class="selected"></span>
                                 <span class="arrow open"></span>
                             </a>
                             <ul class="sub-menu">
                                 <li class="nav-item " id="home">
-                                    <a href="/dashboard_admin" class="nav-link ">
+                                    <a href="/dashboard_staff" class="nav-link ">
                                         <i class="icon-drawer"></i>
                                         <span class="title">Inicio</span>
                                         <span class="selected"></span>
                                     </a>
                                 </li>
-                                <li class="nav-item start " id="listusers">
-                                    <a href="/userList" class="nav-link ">
+                                <li class="nav-item start " id="listscore">
+                                    <a href="/scoreList" class="nav-link ">
                                         <i class="icon-users"></i>
-                                        <span class="title">Ver lista de usuarios</span>
+                                        <span class="title">Ver puntuaciones</span>
                                         
                                     </a>
                                 </li>
 
 
 
-                                <li class="nav-item " id="creatingSchool">
-                            		<a href="javascript:;" class="nav-link nav-toggle">
-                                		<i class="icon-graduation"></i>
-                                		<span class="title">Administrar escuelas</span>
-                                		<span class="arrow"></span>
-                            		</a>
 
-                            		<ul class="sub-menu" >
-                                		<li class="nav-item " id="creatingSchool2">
-                                    		<a href="/schoolCreate" class="nav-link ">
-                                        		<span class="title">Crear escuela </span>
-                                    		</a>
-                                		</li>
-                                        <li class="nav-item  " id="schoolList">
-                                            <a href="/schoolList" class="nav-link ">
-                                                <span class="title">Ver lista de escuelas </span>
-                                            </a>
-                                        </li>
 
-                               
-                            		</ul>
-                        		</li>
                                 <li class="nav-item ">
                                     <a href="/logout_admin" class="nav-link ">
                                         <i class="icon-logout"></i>

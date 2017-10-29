@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 from rest_framework import viewsets, status, mixins, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from oauth2_provider.ext.rest_framework import TokenHasReadWriteScope, \
@@ -17,7 +19,13 @@ from django.http import HttpResponse
 import json 
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import logout
-
+from TT.settings import OAUTH2_PROVIDER,SERVER_IP,BASIC_TOKEN
+import requests
+class SuperAdminPermission(permissions.BasePermission):
+    def has_permission(self, request, view):
+        idp = request.user.pk
+        admin = UserAuth.objects.filter(id=idp,is_superuser=True).exists()
+        return admin
 
 class UsuariosViewSet(mixins.ListModelMixin,
 	#mixins.CreateModelMixin, 
@@ -26,7 +34,7 @@ class UsuariosViewSet(mixins.ListModelMixin,
 	mixins.DestroyModelMixin,
 	viewsets.GenericViewSet):
 	serializer_class = UsuarioSerializer
-	permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
+	permission_classes = [SuperAdminPermission, TokenHasReadWriteScope]
 	authentication_classes = [OAuth2Authentication]
 	queryset = Usuarios.objects.all()
 
@@ -43,11 +51,16 @@ class UsuariosViewSet(mixins.ListModelMixin,
 		usuario.is_valid(raise_exception=True)
 		result = usuario.update(request.data)
 		return Response(result)
+	@list_route(methods=['GET'], permission_classes=[SuperAdminPermission])
+	def getUsuarios(self, request):
+		usuarios = Usuarios.objects.all()
+		seruser = UsuarioSerializer(usuarios,many=True)
+		
+		return Response(seruser.data)
 
 	@csrf_exempt
 	@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
 	def login(self, request):
-		print(request.data)
 		serializer = UsuarioLoginSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		valid = serializer.validated_data
@@ -55,18 +68,37 @@ class UsuariosViewSet(mixins.ListModelMixin,
 			userModel = get_object_or_404(UserAuth, username=valid.get('usuario'))
 			if userModel.is_active:
 				try:
+					
 					user = UserAuth.objects.get(id=userModel.id)
 				except:
 					return Response({'detail': "464"}, status=status.HTTP_401_UNAUTHORIZED,
 								content_type="applicationjson")
-				userAuth = authenticate(username=userModel.username,
+
+				userAuth = authenticate(username=valid.get('usuario'),
 										password=valid.get('contrasena'))
 				if userAuth is not None:
 					login(request, userAuth)
 					resp = Usuarios.objects.get(idUser=userModel.id)
-					print(resp)
 					serResp = UsuarioSerializer(resp).data
+					#peticion token
+					print("quiebro")
+					username=valid.get('usuario')
+					password=valid.get('contrasena')
+					url = "http://"+SERVER_IP + "/o/token/"
+					payload = "grant_type=password&password="+password+"&username="+username
+					headers = {
+					'content-type': "application/x-www-form-urlencoded",
+					'authorization': "Basic "+BASIC_TOKEN,
+					'cache-control': "no-cache",
+					'postman-token': "cba85345-7c4f-f0fc-c3f3-f2e86bfca26c"
+					}
+					try:
+						response = requests.request("POST", url, data=payload, headers=headers)
+					except:
+						return Response({'detail': "461"}, status=status.HTTP_401_UNAUTHORIZED)
 
+					token_json = response.json()
+					serResp["token"] = token_json["access_token"]
 					return Response(serResp)
 				else:
 					return Response({'detail': "461"}, status=status.HTTP_401_UNAUTHORIZED)
@@ -85,6 +117,11 @@ class EscuelasViewSet(mixins.ListModelMixin,
 	permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
 	authentication_classes = [OAuth2Authentication]
 	queryset = Escuelas.objects.all()
+	@list_route(methods=['GET'], permission_classes=[SuperAdminPermission])
+	def getEscuelas(self, request):
+		escuelas = Escuelas.objects.all()
+		serescuela = EscuelaSerializer(escuelas,many=True)
+		return Response(serescuela.data)
 
 
 class GruposViewSet(mixins.ListModelMixin,
@@ -114,6 +151,8 @@ class LeccionViewSet(mixins.ListModelMixin,
 	permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
 	authentication_classes = [OAuth2Authentication]
 	queryset = Leccion.objects.all()
+	#WS que saque la leccion con el nombre y solo requira el bearer mas el id de leccion
+	
 
 class PuntuacionViewSet(mixins.ListModelMixin,
 	mixins.CreateModelMixin, 
@@ -126,3 +165,36 @@ class PuntuacionViewSet(mixins.ListModelMixin,
 	authentication_classes = [OAuth2Authentication]
 	queryset = Puntuaciones.objects.all()
 
+class EveryoneViewSet(mixins.ListModelMixin,
+	mixins.CreateModelMixin, 
+	mixins.RetrieveModelMixin,
+	viewsets.GenericViewSet):
+	serializer_class = UsuarioSerializer
+	authentication_classes = [OAuth2Authentication]
+	queryset = Usuarios.objects.all()
+	@list_route(methods=['GET'], permission_classes=[permissions.AllowAny])
+	def getEscuelas(self, request):
+		escuelas = Escuelas.objects.all()
+		serescuelas = EscuelaSerializer(escuelas,many=True)
+		return Response(serescuelas.data)
+	@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
+	def createProfesor(self, request):
+		profesor = UsuarioCreateSerializer(data=request.data)
+		profesor.is_valid(raise_exception=True)
+		result = profesor.create(request.data)
+		return Response(result)
+	@list_route(methods=['GET'], permission_classes=[permissions.AllowAny])
+	def getGruposbyProfesorId(self, request):
+		try:	
+			id=request.GET['id']
+			profesores = Usuarios.objects.filter(idEscuela=id)
+			grupos = []
+			for y in profesores:
+				grupos.append(Grupos.objects.get(idGrupo=y.idGrupo.idGrupo))
+			sergrupos = GrupoSerializer(grupos,many=True)
+			return Response(sergrupos.data)
+		except:
+			error={}
+			error['error']="ID is required or ID is none"
+			return Response(error)
+	#falta sacar grupos para profsores por escuela

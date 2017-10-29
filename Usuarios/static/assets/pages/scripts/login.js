@@ -136,7 +136,7 @@ var Login = function() {
 
         if (jQuery().select2 && $('#country_list').size() > 0) {
             $("#country_list").select2({
-	            placeholder: '<i class="fa fa-map-marker"></i>&nbsp;Select a Country',
+	            placeholder: '<i class="fa fa-map-marker"></i>&nbsp;Selecciona una escuela',
 	            templateResult: format,
                 templateSelection: format,
                 width: 'auto', 

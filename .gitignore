@@ -2,10 +2,15 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+"show_encoding": false,
 # C extensions
 *.so
+<<<<<<< HEAD
 *.pyc
+=======
+
+TT/settings.py
+>>>>>>> fb8ed012a8f8d19befce420a994da1e7538c82c1
 # Distribution / packaging
 .Python
 env/
@@ -24,7 +29,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-
+settins.py
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
@@ -75,7 +80,7 @@ target/
 
 # celery beat schedule file
 celerybeat-schedule
-
+TT/settings.py
 # SageMath parsed files
 *.sage.py
 
@@ -100,4 +105,8 @@ ENV/
 # mypy
 
 .mypy_cache/
+
+migrations/
+*.pyc
+__init__.py
 
