@@ -177,7 +177,7 @@ class EscuelaCreateSerializer(serializers.Serializer):
 		
 
 class GrupoSerializer(serializers.Serializer):
-	nombre = serializers.CharField(required=True)
+	nombre = serializers.CharField(required=False)
 	idGrupo = serializers.IntegerField(required=False)
 	idUsuario = serializers.IntegerField(required=False)
 	class Meta:
@@ -199,6 +199,12 @@ class GrupoSerializer(serializers.Serializer):
 			None
 		instance.save()
 		return instance
+	def assign(self,validated_data,auxid):
+		grupo = Grupos.objects.get(idGrupo=self.data.get('idGrupo'))
+		usuario = Usuarios.objects.get(idUser=auxid)
+		usuario.idGrupo = grupo
+		usuario.save()
+		return UsuarioSerializer(usuario).data
 
 		
 	
@@ -265,3 +271,11 @@ class UserInformation(serializers.Serializer):
 			return PuntuacionAuxSerializer(puntuaciones,many=True).data
 		except:
 			return "Error while retrieving data UserInformation->Método.267 Serializers"
+	def getPuntuacionesofAlumno(self,validated_data,auxid):
+		
+		idUsuario_aux = Usuarios.objects.get(idUser=auxid,tipoUsuario=True)
+		print(idUsuario_aux.idGrupo.idGrupo)
+		usuarios = Usuarios.objects.filter(idGrupo=idUsuario_aux.idGrupo,tipoUsuario=False)
+		return UsuarioSerializer(usuarios,many=True).data
+	
+		return "Error while retrieving data UserInformation->Método.274 Serializers"

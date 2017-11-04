@@ -104,8 +104,9 @@ class UsuariosViewSet(mixins.ListModelMixin,
 						return Response({'detail': "461"}, status=status.HTTP_401_UNAUTHORIZED)
 
 					token_json = response.json()
+					
 					serResp["token"] = token_json["access_token"]
-					return Response(serResp)
+					return Response(token_json["access_token"])
 				else:
 					return Response({'detail': "461"}, status=status.HTTP_401_UNAUTHORIZED)
 			else:
@@ -145,6 +146,12 @@ class GruposViewSet(mixins.ListModelMixin,
 		ser.is_valid(raise_exception=True)
 		result = ser.create(request.data,auxid=request.user.pk)
 		return Response(result)
+	@list_route(methods=['POST'], permission_classes=[ProfesorPermission])
+	def assignGrupo(self,request):
+		ser = GrupoSerializer(data=request.data)
+		ser.is_valid(raise_exception=True)
+		result = ser.assign(request.data,auxid=request.user.pk)
+		return Response(result)
 
 
 class LeccionViewSet(mixins.ListModelMixin,
@@ -183,6 +190,12 @@ class PuntuacionViewSet(mixins.ListModelMixin,
 		return Response(result)
 	@list_route(methods=['GET'], permission_classes=[ProfesorPermission])
 	def getPuntuacionesforProfesor(self,request):
+		ser = UserInformation(data=request.data)
+		ser.is_valid(raise_exception=True)
+		result = ser.getPuntuacionesofAlumno(validated_data=request.data,auxid=request.user.pk)
+		return Response(result)
+	@list_route(methods=['GET'], permission_classes=[ProfesorPermission])
+	def getAlumnosbyGrupo(self,request):
 		ser = UserInformation(data=request.data)
 		ser.is_valid(raise_exception=True)
 		result = ser.getPuntuacionesofAlumno(validated_data=request.data,auxid=request.user.pk)

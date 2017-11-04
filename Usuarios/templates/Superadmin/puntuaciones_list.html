@@ -1,4 +1,4 @@
-{% extends 'Superadmin/menu_layout_student.html' %}
+    {% extends 'Superadmin/menu_layout_student.html' %}
   {% block content %}
 {% load staticfiles %}
         {% block title %}TT2016-B065 | Ver puntuaciones{% endblock %}
@@ -44,12 +44,13 @@
                                             </thead>
                                             <tbody>
 
-                                            <!--{% for leccion in lecciones %}
+                                            {% for puntuacion in puntuaciones %}
                                                 <tr>
-                                                    <td id="{{school.idEscuela}}">{{leccion.idEscuela}}</td>
-                                                    <td id="{{school.idEscuela}}">{{leccion.nombre}}</td>
+                                                    <td id="{{puntuacion.idLeccion}}">{{puntuacion.idLeccion}}</td>
+                                                    <td id="{{puntuacion.idLeccion}}">{{puntuacion.nombre}}</td>
+                                                    <td id="{{puntuacion.idLeccion}}">{{puntuacion.leccion}}</td>
                                                     
-                                                    <td id="{{school.idEscuela}}">
+                                                    <td id="{{puntuacion.idEscuela}}">
 
                                                         <button class="btn btn-outline  purple" data-toggle="modal" href="#seeScore" onclick="setdata('{{leccion.idLeccion}}')"><i class="fa fa-edit"></i> Ver</button>
 
@@ -57,7 +58,7 @@
 
                                                 </tr>
                                             {% endfor %}
-                                            -->
+                                            
                                             </tbody>
                                         </table>
 

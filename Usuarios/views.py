@@ -330,34 +330,31 @@ def school_list(request):
 		return redirect('/logout_admin')
 def score_list(request):
 
-	try:
-		tokenSession = AccessToken.objects.get(token=request.session['token'])
-		usuario = request.session['userid']
+	#try:
+	tokenSession = AccessToken.objects.get(token=request.session['token'])
+	usuario = request.session['userid']
 
-		if timezone.now() > tokenSession.expires:
-			#print("ERRROR1")
-			request.session['token'] = None
-			return redirect('/logout_admin')
-		else:
-			try:
-				user = Usuarios.objects.get(idUser=usuario,tipoUsuario=False)
-				'''
-				user = UserAuth.objects.get(id=usuario,is_superuser=True)
-				url = "http://"+SERVER_IP+"/v1/escuelas/"
-				headers = {
-					'authorization': "Bearer " +str(tokenSession),
-					'cache-control': "no-cache",
-					'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
-					}
-				response = requests.request("GET", url, headers=headers)
-				response.encoding = 'UTF-8'
-				schools = json.loads(response.text)
-				'''
-				return render(request,'Superadmin/puntuaciones_list.html' , {"SERVER_IP":SERVER_IP})
-			except:
-				return render(request, 'Superadmin/Unauthorized.html', {})
-	except:
+	if timezone.now() > tokenSession.expires:
+		#print("ERRROR1")
+		request.session['token'] = None
 		return redirect('/logout_admin')
+	else:
+		try:
+			user = Usuarios.objects.get(idUser=usuario,tipoUsuario=False)
+			url = "http://"+SERVER_IP+"/v1/puntuaciones/getPuntuacionbyAlumno"
+			headers = {
+				'authorization': "Bearer " +str(tokenSession),
+				'cache-control': "no-cache"
+				}
+			response = requests.request("GET", url, headers=headers)
+			response.encoding = 'UTF-8'
+			puntuaciones = json.loads(response.text)
+			
+			return render(request,'Superadmin/puntuaciones_list.html'.encode('utf8') , {"SERVER_IP":SERVER_IP,"puntuaciones":puntuaciones})
+		except:
+			return render(request, 'Superadmin/Unauthorized.html', {})
+	#except:
+			
 
 #####################################
 @csrf_exempt
