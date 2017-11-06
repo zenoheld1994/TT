@@ -61,7 +61,6 @@ class UsuariosViewSet(mixins.ListModelMixin,
 	def getUsuarios(self, request):
 		usuarios = Usuarios.objects.all()
 		seruser = UsuarioSerializer(usuarios,many=True)
-		
 		return Response(seruser.data)
 
 	@csrf_exempt
@@ -87,7 +86,6 @@ class UsuariosViewSet(mixins.ListModelMixin,
 					resp = Usuarios.objects.get(idUser=userModel.id)
 					serResp = UsuarioSerializer(resp).data
 					#peticion token
-					print("quiebro")
 					username=valid.get('usuario')
 					password=valid.get('contrasena')
 					url = "http://"+SERVER_IP + "/o/token/"
@@ -154,8 +152,7 @@ class GruposViewSet(mixins.ListModelMixin,
 		return Response(result)
 
 
-class LeccionViewSet(mixins.ListModelMixin,
-	mixins.CreateModelMixin, 
+class LeccionViewSet(mixins.ListModelMixin,	
 	mixins.RetrieveModelMixin,
 	mixins.UpdateModelMixin,
 	mixins.DestroyModelMixin,
@@ -164,6 +161,12 @@ class LeccionViewSet(mixins.ListModelMixin,
 	permission_classes = [permissions.IsAuthenticated, TokenHasReadWriteScope]
 	authentication_classes = [OAuth2Authentication]
 	queryset = Leccion.objects.all()
+	@list_route(methods=['POST'], permission_classes=[SuperAdminPermission])
+	def createLeccion(self,request):
+		ser = LeccionSerializer(data=request.data)
+		ser.is_valid(raise_exception=True)
+		result = ser.create(request.data)
+		return Response(result)
 	#WS que saque la leccion con el nombre y solo requira el bearer mas el id de leccion
 	
 
@@ -184,21 +187,25 @@ class PuntuacionViewSet(mixins.ListModelMixin,
 		return Response(result)
 	@list_route(methods=['GET'], permission_classes=[permissions.IsAuthenticated])
 	def getPuntuacionbyAlumno(self,request):
+		id=request.GET['leccion']
 		ser = UserInformation(data=request.data)
 		ser.is_valid(raise_exception=True)
-		result = ser.getPuntuaciones(validated_data=request.data,auxid=request.user.pk)
+		result = ser.getPuntuaciones(validated_data=request.data,auxid=request.user.pk,leccion=id)
+		
 		return Response(result)
 	@list_route(methods=['GET'], permission_classes=[ProfesorPermission])
-	def getPuntuacionesforProfesor(self,request):
+	def getPuntuacionesofAlumnoforProfesor(self,request):
+		leccion=request.GET['leccion']
+		id=request.GET['id']
 		ser = UserInformation(data=request.data)
 		ser.is_valid(raise_exception=True)
-		result = ser.getPuntuacionesofAlumno(validated_data=request.data,auxid=request.user.pk)
+		result = ser.getPuntuacionesofAlumnoforProfesor(validated_data=request.data,auxid=id,idleccion=leccion)
 		return Response(result)
 	@list_route(methods=['GET'], permission_classes=[ProfesorPermission])
 	def getAlumnosbyGrupo(self,request):
-		ser = UserInformation(data=request.data)
-		ser.is_valid(raise_exception=True)
-		result = ser.getPuntuacionesofAlumno(validated_data=request.data,auxid=request.user.pk)
+		id=request.GET['id']
+		alumnos = Usuarios.objects.filter(idGrupo=id,tipoUsuario=False)
+		result = UsuarioSerializer(alumnos,many=True).data
 		return Response(result)
 	#falta el que el wey mande su id y le devuelva su puntuacion yo digo que con un get
 	'''
@@ -223,10 +230,20 @@ class EveryoneViewSet(mixins.ListModelMixin,
 		return Response(serescuelas.data)
 	@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
 	def createProfesor(self, request):
-		profesor = UsuarioCreateSerializer(data=request.data)
+		profesor = UsuarioCreateSerializer2(data=request.data)
 		profesor.is_valid(raise_exception=True)
 		result = profesor.create(request.data)
 		return Response(result)
+
+	@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
+	def createAlumno(self, request):
+		profesor = UsuarioCreateSerializer3(data=request.data)
+		profesor.is_valid(raise_exception=True)
+		result = profesor.create(request.data)
+		return Response(result)
+
+
+
 	@list_route(methods=['GET'], permission_classes=[permissions.AllowAny])
 	def getGruposbyProfesorId(self, request):
 		try:	

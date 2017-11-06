@@ -98,6 +98,85 @@ class UsuarioCreateSerializer(serializers.Serializer):
 			return "ERROR WHILE CREATING USER"
 
 		return UsuarioSerializer(usuario).data
+
+class UsuarioCreateSerializer2(serializers.Serializer):
+	tipoUsuario = serializers.BooleanField(required=True)
+	usuario = serializers.CharField(required=True)
+	contrasena = serializers.CharField(required=True)
+	nombre = serializers.CharField(required=True)
+	idEscuela = serializers.IntegerField(required=True)
+	nameGrupo = serializers.CharField(required=True)
+	class Meta:
+		model = Usuarios
+		fields = ('tipoUsuario','usuario','contrasena','nombre','idEscuela','nameGrupo')
+	def validate_contrasena(self,value):
+		algo = re.match('\w{5}',value)
+		if algo:
+		   return value
+		else:
+			raise serializers.ValidationError("La contraseña debe ser de al menos 5 caracteres")
+	def validate_usuario(self,value):
+		if UserAuth.objects.filter(username=value).exists():
+			raise serializers.ValidationError("El usuario ya existe use otro")
+		return value
+	def create(self, validated_data):
+		try:
+			userauth = UserAuth.objects.create_user(username=self.data.get('usuario'), password=self.data.get('contrasena'),
+				is_active=1)
+			try:
+				escuela_aux = Escuelas.objects.get(pk=self.data.get('idEscuela'))
+				grupo = Grupos.objects.create(nombre=self.data.get('nameGrupo'))
+				usuario = Usuarios(tipoUsuario=self.data.get('tipoUsuario'),
+					nombre=self.data.get('nombre'),idUser=userauth.id,
+					idEscuela=escuela_aux,idGrupo=grupo)
+				usuario.save()
+			except:
+				userauth.delete()
+				return "ERROR WHILE CREATING USER"
+		except:
+			userauth.delete()
+			return "ERROR WHILE CREATING USER"
+		return UsuarioSerializer(usuario).data
+
+class UsuarioCreateSerializer3(serializers.Serializer):
+	usuario = serializers.CharField(required=True)
+	contrasena = serializers.CharField(required=True)
+	nombre = serializers.CharField(required=True)
+	idEscuela = serializers.IntegerField(required=True)
+	grupo = serializers.IntegerField(required=True)
+	class Meta:
+		model = Usuarios
+		fields = ('usuario','contrasena','nombre','idEscuela','grupo')
+	def validate_contrasena(self,value):
+		algo = re.match('\w{5}',value)
+		if algo:
+		   return value
+		else:
+			raise serializers.ValidationError("La contraseña debe ser de al menos 5 caracteres")
+	def validate_usuario(self,value):
+		if UserAuth.objects.filter(username=value).exists():
+			raise serializers.ValidationError("El usuario ya existe use otro")
+		return value
+	def create(self, validated_data):
+		try:
+			userauth = UserAuth.objects.create_user(username=self.data.get('usuario'), password=self.data.get('contrasena'),
+				is_active=1)
+			try:
+				escuela_aux = Escuelas.objects.get(pk=self.data.get('idEscuela'))
+				grupo = Grupos.objects.get(idGrupo=self.data.get('grupo'))
+				usuario = Usuarios(tipoUsuario=False,
+					nombre=self.data.get('nombre'),idUser=userauth.id,
+					idEscuela=escuela_aux,idGrupo=grupo)
+				usuario.save()
+			except:
+				userauth.delete()
+				return "ERROR WHILE CREATING USER"
+		except:
+			userauth.delete()
+			return "ERROR WHILE CREATING USER"
+		return UsuarioSerializer(usuario).data
+
+
 class UsuarioUpdateSerializer(serializers.Serializer):
 	contrasena = serializers.CharField(required=False)
 	nombre = serializers.CharField(required=False)
@@ -211,12 +290,22 @@ class GrupoSerializer(serializers.Serializer):
 
 class LeccionSerializer(serializers.Serializer):
 	idLeccion = serializers.CharField(required=False)
-	nombre = serializers.CharField()
+	nombre = serializers.CharField(required=False)
 	class Meta:
 		model = Leccion
 		fields = ('nombre')
 	def create(self,validated_data):
-		return Leccion.objects.create(**validated_data)
+		nombre = "Lección "
+		try:
+			id=Leccion.objects.latest('idLeccion').idLeccion
+			id+=1
+		except:
+			id=1
+		try:
+			leccion = Leccion.objects.create(nombre=nombre+str(id),idLeccion=id)
+		except:
+			return "ERROR WHILE CREATING LECCION"
+		return LeccionSerializer(leccion).data
 	def update(self, instance, validated_data):	
 		instance.nombre = validated_data.get('nombre', instance.nombre)
 		instance.save()
@@ -233,6 +322,13 @@ class PuntuacionAuxSerializer(serializers.Serializer):
 		return obj.idUsuario.pk
 	def get_idLeccion(self,obj):
 		return obj.idLeccion.pk
+class PuntuacionAux2Serializer(serializers.Serializer):
+	idPuntuacion = serializers.IntegerField(required=False)
+	puntuacion = serializers.IntegerField(required=False)
+	class Meta:
+		model = Leccion
+		fields = ('idPuntuacion','puntuacion')
+
 class PuntuacionSerializer(serializers.Serializer):
 	idPuntuacion = serializers.IntegerField(required=False)
 	puntuacion = serializers.IntegerField(required=False)
@@ -257,25 +353,22 @@ class UserInformation(serializers.Serializer):
 	class Meta:
 		model = Usuarios
 		fields = ('idUsuario',)
-	def getPuntuaciones(self,validated_data,auxid):
+	def getPuntuaciones(self,validated_data,auxid,leccion):
 		try:
 			idUsuario_aux = Usuarios.objects.get(idUser=auxid,tipoUsuario=False)
-			puntuaciones = Puntuaciones.objects.filter(idUsuario=idUsuario_aux.idUsuario)
-			return PuntuacionAuxSerializer(puntuaciones,many=True).data
+			puntuaciones = Puntuaciones.objects.filter(idUsuario=idUsuario_aux.idUsuario,idLeccion=leccion)
+			return PuntuacionAux2Serializer(puntuaciones,many=True).data
 		except:
-			return "Error while retrieving data UserInformation->Método.260 Serializers"
+			return "Error while retrieving data UserInformation->Método.360 Serializers"
 	def getPuntuacionesofAlumno(self,validated_data,auxid):
-		try:
-			idUsuario_aux = Usuarios.objects.get(idUsuario=auxid,tipoUsuario=False)
-			puntuaciones = Puntuaciones.objects.filter(idUsuario=idUsuario_aux.idUsuario)
-			return PuntuacionAuxSerializer(puntuaciones,many=True).data
-		except:
-			return "Error while retrieving data UserInformation->Método.267 Serializers"
-	def getPuntuacionesofAlumno(self,validated_data,auxid):
-		
-		idUsuario_aux = Usuarios.objects.get(idUser=auxid,tipoUsuario=True)
-		print(idUsuario_aux.idGrupo.idGrupo)
-		usuarios = Usuarios.objects.filter(idGrupo=idUsuario_aux.idGrupo,tipoUsuario=False)
-		return UsuarioSerializer(usuarios,many=True).data
+		idUsuario_aux = Usuarios.objects.get(idUsuario=auxid,tipoUsuario=False)
+		puntuaciones = Puntuaciones.objects.filter(idUsuario=idUsuario_aux.idUsuario)
+		return PuntuacionAuxSerializer(puntuaciones,many=True).data
 	
-		return "Error while retrieving data UserInformation->Método.274 Serializers"
+		return "Error while retrieving data UserInformation->Método.367 Serializers"
+	def getPuntuacionesofAlumnoforProfesor(self,validated_data,auxid,idleccion):
+		idUsuario_aux = Usuarios.objects.get(idUsuario=auxid,tipoUsuario=False)
+		puntuaciones = Puntuaciones.objects.filter(idUsuario=idUsuario_aux.idUsuario,idLeccion=idleccion)
+		return PuntuacionAuxSerializer(puntuaciones,many=True).data
+	
+		return "Error while retrieving data UserInformation->Método.374 Serializers"

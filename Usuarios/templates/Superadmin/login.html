@@ -125,16 +125,16 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label visible-ie8 visible-ie9">Grupo</label>
-                    <select name="city" id="grupo" class="select2 form-control">
+                    <select name="grupo" id="grupo" class="select2 form-control">
                         <option value=""></option>
                         
                               
-                              <option value="6A{{ciclo}}">6A {{ciclo}}</option>
-                              <option value="6B{{ciclo}}">6B {{ciclo}}</option>
-                              <option value="6C{{ciclo}}">6C {{ciclo}}</option>
-                              <option value="6D{{ciclo}}">6D {{ciclo}}</option>
-                              <option value="6E{{ciclo}}">6E {{ciclo}}</option>
-                              <option value="6F{{ciclo}}">6F {{ciclo}}</option>
+                              <option value="6A {{ciclo}}">6A {{ciclo}}</option>
+                              <option value="6B {{ciclo}}">6B {{ciclo}}</option>
+                              <option value="6C {{ciclo}}">6C {{ciclo}}</option>
+                              <option value="6D {{ciclo}}">6D {{ciclo}}</option>
+                              <option value="6E {{ciclo}}">6E {{ciclo}}</option>
+                              <option value="6F {{ciclo}}">6F {{ciclo}}</option>
                         
                     </select>   
                 </div>  
@@ -168,7 +168,7 @@
                     <button type="submit"   class="btn green pull-right"> Crear </button>
                 </div>
             </form>
-            <form class="register-form-2" action="login_page_create_alumno" method="post" id="myform_2" style="display:none;">
+            <form class="register-form-2" action="login_page_create_alumno" method="post" id="" style="display:none;">
                 <h3>Registro de Alumno</h3>
                 
 
@@ -200,16 +200,11 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label visible-ie8 visible-ie9">Grupo</label>
-                    <select name="city" id="grupo" class="select2 form-control">
-                        <option value=""></option>
+                    <select name="grupoalumno" id="grupoalumno" class="select2 form-control">
+                        
                         
                               
-                              <option value="6A{{ciclo}}">6A {{ciclo}}</option>
-                              <option value="6B{{ciclo}}">6B {{ciclo}}</option>
-                              <option value="6C{{ciclo}}">6C {{ciclo}}</option>
-                              <option value="6D{{ciclo}}">6D {{ciclo}}</option>
-                              <option value="6E{{ciclo}}">6E {{ciclo}}</option>
-                              <option value="6F{{ciclo}}">6F {{ciclo}}</option>
+
                         
                     </select>   
                 </div>  
@@ -218,14 +213,14 @@
                     <label class="control-label visible-ie8 visible-ie9">Password</label>
                     <div class="input-icon">
                         <i class="fa fa-lock"></i>
-                        <input class="form-control placeholder-no-fix" type="password" autocomplete="off" id="register_password" placeholder="Contraseña" name="password" /> </div>
+                        <input class="form-control placeholder-no-fix" type="password" autocomplete="off" id="password2" placeholder="Contraseña" name="password2" /> </div>
                 </div>
                 <div class="form-group">
                     <label class="control-label visible-ie8 visible-ie9">Re-type Your Password</label>
                     <div class="controls">
                         <div class="input-icon">
                             <i class="fa fa-check"></i>
-                            <input class="form-control placeholder-no-fix" type="password" autocomplete="off" placeholder="Escribe tu contraseña nuevamente" name="rpassword" /> </div>
+                            <input class="form-control placeholder-no-fix" type="password" autocomplete="off" placeholder="Escribe tu contraseña nuevamente" name="passwordagain" /> </div>
                     </div>
                 </div>
 
@@ -274,7 +269,7 @@
             var settings = {
               "async": true,
               "crossDomain": true,
-              "url": "http://localhost:5000/v1/everyone/getGruposbyProfesorId?id="+id,
+              "url": "http://"+"{{SERVER_IP}}"+"/v1/everyone/getGruposbyProfesorId?id="+id,
               "method": "GET",
               "headers": {
                 "content-type": "application/json",
@@ -283,9 +278,18 @@
               }
               
             }
-
+            
             $.ajax(settings).done(function (response) {
-              console.log(response);
+              var selectgrupos = document.getElementById('grupoalumno');
+              $("#grupoalumno").empty()
+              for (var i in response) {
+                    if(response[i].nombre==null){
+                        $(selectgrupos).append("<option value=''>  No hay grupos  </option>");
+                        break;
+                    }
+                    $(selectgrupos).append('<option value=' + response[i].idGrupo + '>' + response[i].nombre + '</option>');
+                }
+
             });
             }
 

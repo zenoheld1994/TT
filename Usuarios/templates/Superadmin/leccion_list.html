@@ -1,0 +1,225 @@
+{% extends 'Superadmin/menu_layout.html' %}
+  {% block content %}
+{% load staticfiles %}
+        {% block title %}TT2016-B065 | Ver listado de lecciones{% endblock %}
+        {% block CSS1 %}
+    <link href="{% static 'assets/global/plugins/datatables/datatables.min.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/global/plugins/bootstrap-sweetalert/sweetalert.css' %}" rel="stylesheet" type="text/css" />
+    {% endblock %}
+
+
+                    <!-- BEGIN PAGE HEAD-->
+                    <div class="page-head">
+                        <!-- BEGIN PAGE TITLE -->
+                        <div class="page-title">
+                            <h1>Ver listado de lecciones
+                                
+                            </h1>
+                        </div>
+                        <!-- END PAGE TITLE -->
+                        
+                    </div>
+                    <!-- END PAGE HEAD-->
+                    <!-- BEGIN PAGE BASE CONTENT -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- BEGIN SAMPLE TABLE PORTLET-->
+                            <div class="portlet light bordered">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <i class="icon-users font-green"></i>
+                                        <span class="caption-subject font-green bold uppercase">Lecciones</span>
+                                    </div>
+
+                                </div>
+                                <center>
+                                    <button class="btn green btn-outline" onclick="createLeccion()"><i class="fa fa-plus"></i> Crear</button>
+                                </center>
+                                  
+                                <div class="portlet-body">
+
+                                        <table class="table table-striped table-bordered table-hover dt-responsive" width="100%" id="sample_1">
+
+
+                                            <thead>
+
+                                                <tr>
+                                                    <th> # </th>
+                                                    <th> Nombre </th>
+                                                    <th> Eliminar </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                            {% for leccion in lecciones %}
+                                                <tr>
+                                                    <td id="{{leccion.idLeccion}}">{{leccion.idLeccion}}</td>
+                                                    <td id="{{leccion.idLeccion}}">{{leccion.nombre}}</td>
+                                                    <td><button class="btn red btn-outline" onclick="deleteLeccion('{{leccion.idLeccion}}')"><i class="fa fa-close"></i> Eliminar</button>
+                                                    </td>
+                                                    
+                                                </tr>
+                                            {% endfor %}
+                                            </tbody>
+                                        </table>
+
+                                    
+                                </div>
+                            </div>
+                            <!-- END SAMPLE TABLE PORTLET-->
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+                    
+                    
+                    
+
+            <!-- END CONTENT -->
+            <!-- BEGIN QUICK SIDEBAR -->
+            <a href="javascript:;" class="page-quick-sidebar-toggler">
+                <i class="icon-login"></i>
+            </a>
+            
+            <!-- END QUICK SIDEBAR -->
+        </div>
+        <!-- END CONTAINER -->
+        <!-- BEGIN FOOTER -->
+
+        <!-- END FOOTER -->
+        <!-- BEGIN QUICK NAV -->
+        
+        
+        <!-- END QUICK NAV -->
+        <!--[if lt IE 9]>
+<script src= "{% static 'assets/global/plugins/respond.min.js' %}"></script>
+<script src= "{% static 'assets/global/plugins/excanvas.min.js' %}"></script> 
+<script src= "{% static 'assets/global/plugins/ie8.fix.min.js' %}"></script> 
+<![endif]-->
+        <!-- BEGIN CORE PLUGINS -->
+
+        <!-- END CORE PLUGINS -->
+        <!-- BEGIN PAGE LEVEL PLUGINS -->
+        {% block js_1 %}
+
+        {% endblock %}
+        <!-- END PAGE LEVEL PLUGINS -->
+
+        <!-- BEGIN PAGE LEVEL SCRIPTS -->
+        {% block js_2 %}
+
+
+
+        <script>
+        var set_active = document.getElementById("leccionList");
+        set_active.className += " active";
+     
+        function createLeccion() {
+           var token = '{{request.session.token}}';
+            swal({
+                          title: "¿Desea realizar esta operación?",
+                          text: "Crear Lección",
+                          type: "warning",
+                          showCancelButton: true,
+                          confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Crear",
+                          closeOnConfirm: false
+                        },
+                        function(){
+
+                                var settings = {
+                                  "async": true,
+                                  "crossDomain": true,
+                                  "url": "http://"+"{{SERVER_IP}}"+"/v1/lecciones/createLeccion",
+                                  "method": "POST",
+                                  "headers": {
+                                    "content-type": "application/json",
+                                    "authorization": "Bearer " + token,
+                                    "cache-control": "no-cache"
+                                  },
+                                  "processData": false,
+                                  
+                                  
+                                  beforeSend: function () {
+                                        console.log('antes');
+                                    },
+                                    complete: function () {
+                                        swal("Creado", "La lección ha sido creada", "success");
+                                        location.reload();
+                                    },
+                                    error: function (algo) {
+                                        swal("Error", "Error en el servicio", "error");
+                                        console.log(algo);
+                                    }
+                                }
+
+                                console.log(settings);
+
+                                $.ajax(settings).done(function (response) {
+                                  console.log(response);
+                                });
+                        });
+        }
+        function deleteLeccion(id) {
+           var token = '{{request.session.token}}';
+            swal({
+                          title: "¿Desea eliminar esta lección?",
+                          text: "Eliminar Lección",
+                          type: "warning",
+                          showCancelButton: true,
+                          confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Eliminar",
+                          closeOnConfirm: false
+                        },
+                        function(){
+
+                                var settings = {
+                                  "async": true,
+                                  "crossDomain": true,
+                                  "url": "http://"+"{{SERVER_IP}}"+"/v1/lecciones/"+id,
+                                  "method": "DELETE",
+                                  "headers": {
+                                    "content-type": "application/json",
+                                    "authorization": "Bearer " + token,
+                                    "cache-control": "no-cache"
+                                  },
+                                  "processData": false,
+                                  
+                                  
+                                  beforeSend: function () {
+                                        console.log('antes');
+                                    },
+                                    complete: function () {
+                                        swal("Eliminada", "La lección ha sido eliminada", "success");
+                                        location.reload();
+                                    },
+                                    error: function (algo) {
+                                        swal("Error", "Error en el servicio", "error");
+                                        console.log(algo);
+                                    }
+                                }
+
+                                console.log(settings);
+
+                                $.ajax(settings).done(function (response) {
+                                  console.log(response);
+                                });
+                        });
+        }
+
+
+        </script>
+
+        {% endblock %}
+
+
+
+
+
+        {% endblock %}
+
+
+        <!-- END THEME LAYOUT SCRIPTS -->

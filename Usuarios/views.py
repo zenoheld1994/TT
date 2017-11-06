@@ -41,7 +41,7 @@ def login_page(request):
 		ciclo =  str(yearofdate-1)+"-"+str(yearofdate)
 	return render(request, 'Superadmin/login.html', {"schools":schools,"SERVER_IP":SERVER_IP,"ciclo":ciclo})
 
-'''
+
 def school_create(request):
 	try:
 		tokenSession = AccessToken.objects.get(token=request.session['token'])
@@ -92,40 +92,50 @@ def school_save(request):
 		except:
 			return render(request, 'Superadmin/Unauthorized.html', {})
 	return redirect('/logout_admin')
-'''
+
 @csrf_exempt
 def profesor_create(request):
 	name=(request.POST['fullname'])
 	user=(request.POST['address'])
 	school=request.POST['country']
 	password=request.POST['password']
+	grupo = request.POST['grupo']
 	url = "http://"+SERVER_IP+"/v1/everyone/createProfesor"
-	payload = "{\n    \"nombre\": \""+name+"\",\n    \"usuario\": \""+user+"\",\n    \"idEscuela\":\""+school+"\",\n    \"contrasena\":\""+password+"\",\n    \"tipoUsuario\":1\n}"
+	payload = "{\n    \"nombre\": \""+name+"\",\n    \"usuario\": \""+user+"\",\n    \"idEscuela\":\""+school+"\",\n    \"nameGrupo\":\""+grupo+"\",\n    \"contrasena\":\""+password+"\",\n    \"tipoUsuario\":1\n}"
 	headers = {
 		'cache-control': "no-cache",
-		'content-type': "application/json",	
-		'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
+		'content-type': "application/json"
 		}
 	response = requests.request("POST", url,data=payload, headers=headers)
 	status=response.status_code
 
-	url2 = "http://"+SERVER_IP+"/v1/everyone/getEscuelas"
+	try:
+		messages.success(request, 'ANY')
+		return redirect('/login_page')
+	except:
+		return redirect('/login_page')
 
-	headers2 = {
-		'content-type': "application/json",
+@csrf_exempt
+def alumno_create(request):
+	name=(request.POST['fullname'])
+	user=(request.POST['address'])
+	school=request.POST['country']
+	password=request.POST['password2']
+	grupo = request.POST['grupoalumno']
+	url = "http://"+SERVER_IP+"/v1/everyone/createAlumno"
+	payload = "{\n    \"nombre\": \""+name+"\",\n    \"usuario\": \""+user+"\",\n    \"idEscuela\":\""+school+"\",\n    \"grupo\":\""+grupo+"\",\n    \"contrasena\":\""+password+"\" \n}"
+	headers = {
 		'cache-control': "no-cache",
-		'postman-token': "572188b3-a5b1-ba0d-483a-25c212ed488f"
+		'content-type': "application/json"
 		}
-
-	response2 = requests.request("GET", url2,  headers=headers2)
-	schools = json.loads(response2.text)
+	response = requests.request("POST", url,data=payload, headers=headers)
+	status=response.status_code
 
 	try:
 		messages.success(request, 'ANY')
-		return render(request, 'Superadmin/login.html', {"schools":schools,"SERVER_IP":SERVER_IP})
+		return redirect('/login_page')
 	except:
-		return render(request, 'Superadmin/login.html', {"schools":schools,"SERVER_IP":SERVER_IP})
-
+		return redirect('/login_page')
 
 
 def school_list(request):
@@ -160,6 +170,60 @@ def school_list(request):
 
 
 def user_list(request):
+	
+	tokenSession = AccessToken.objects.get(token=request.session['token'])
+	usuario = request.session['userid']
+	if timezone.now() > tokenSession.expires:
+		request.session['token'] = None
+		return redirect('/logout_admin')
+	else:
+		try:
+			user = UserAuth.objects.get(id=usuario,is_superuser=True)
+			url = "http://"+SERVER_IP+"/v1/usuarios/"
+			headers = {
+				'authorization': "Bearer " +str(tokenSession),
+				'cache-control': "no-cache",
+				'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
+				}
+			response = requests.request("GET", url, headers=headers)
+			response.encoding = 'UTF-8'
+			users = json.loads(response.text)
+
+			return render(request,'Superadmin/user_list.html' , {"SERVER_IP":SERVER_IP,"users":users})
+		
+			return render(request, 'Superadmin/Unauthorized.html', {})
+		except:
+			return redirect('/logout_admin')
+def alumno_list(request):
+	
+	tokenSession = AccessToken.objects.get(token=request.session['token'])
+	usuario = request.session['userid']
+	if timezone.now() > tokenSession.expires:
+		request.session['token'] = None
+		return redirect('/logout_admin')
+	else:
+		#try:
+			user = UserAuth.objects.get(id=usuario)
+			usuario = Usuarios.objects.get(idUser=usuario)
+
+			url = "http://"+SERVER_IP+"/v1/puntuaciones/getAlumnosbyGrupo?id="+str(usuario.idGrupo.idGrupo)
+			headers = {
+				'authorization': "Bearer " +str(tokenSession),
+				"content-type": "application/json",
+				'cache-control': "no-cache"
+
+				}
+
+			response = requests.request("GET", url, headers=headers)
+			print(response.text)
+			response.encoding = 'UTF-8'
+			alumnos = json.loads(response.text)
+			
+			grupo = usuario.idGrupo.nombre
+			return render(request,'Superadmin/student_list.html' , {"SERVER_IP":SERVER_IP,"alumnos":alumnos,"grupo":grupo})
+		#except:
+			return redirect('/logout_admin')
+def leccion_list(request):
 	try:
 		tokenSession = AccessToken.objects.get(token=request.session['token'])
 		usuario = request.session['userid']
@@ -169,7 +233,7 @@ def user_list(request):
 		else:
 			try:
 				user = UserAuth.objects.get(id=usuario,is_superuser=True)
-				url = "http://"+SERVER_IP+"/v1/usuarios/"
+				url = "http://"+SERVER_IP+"/v1/lecciones/"
 				headers = {
 					'authorization': "Bearer " +str(tokenSession),
 					'cache-control': "no-cache",
@@ -177,9 +241,34 @@ def user_list(request):
 					}
 				response = requests.request("GET", url, headers=headers)
 				response.encoding = 'UTF-8'
-				users = json.loads(response.text)
+				lecciones = json.loads(response.text)
 
-				return render(request,'Superadmin/user_list.html' , {"SERVER_IP":SERVER_IP,"users":users})
+				return render(request,'Superadmin/leccion_list.html' , {"SERVER_IP":SERVER_IP,"lecciones":lecciones})
+			except:
+				return render(request, 'Superadmin/Unauthorized.html', {})
+	except:
+		return redirect('/logout_admin')
+
+def puntuaciones_list(request):
+	try:
+		tokenSession = AccessToken.objects.get(token=request.session['token'])
+		usuario = request.session['userid']
+		if timezone.now() > tokenSession.expires:
+			request.session['token'] = None
+			return redirect('/logout_admin')
+		else:
+			try:
+				user = UserAuth.objects.get(id=usuario)
+				url = "http://"+SERVER_IP+"/v1/lecciones/"
+				headers = {
+					'authorization': "Bearer " +str(tokenSession),
+					'cache-control': "no-cache",
+					'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
+					}
+				response = requests.request("GET", url, headers=headers)
+				response.encoding = 'UTF-8'
+				lecciones = json.loads(response.text)
+				return render(request,'Superadmin/puntuaciones_list.html' , {"SERVER_IP":SERVER_IP,"lecciones":lecciones})
 			except:
 				return render(request, 'Superadmin/Unauthorized.html', {})
 	except:
@@ -218,7 +307,7 @@ def dashboardStaff(request):
 		else:
 			if ID:
 				try:
-					user = UserAuth.objects.get(id=ID,is_superuser=True)
+					user = UserAuth.objects.get(id=ID)
 					request.session['userid']
 					username = request.session['username']
 					return render(request, 'Superadmin/Welcome_staff.html', {"username":username})
@@ -328,7 +417,7 @@ def school_list(request):
 				return render(request, 'Superadmin/Unauthorized.html', {})
 	except:
 		return redirect('/logout_admin')
-def score_list(request):
+'''def score_list(request):
 
 	#try:
 	tokenSession = AccessToken.objects.get(token=request.session['token'])
@@ -353,7 +442,7 @@ def score_list(request):
 			return render(request,'Superadmin/puntuaciones_list.html'.encode('utf8') , {"SERVER_IP":SERVER_IP,"puntuaciones":puntuaciones})
 		except:
 			return render(request, 'Superadmin/Unauthorized.html', {})
-	#except:
+	#except:'''
 			
 
 #####################################
@@ -376,26 +465,31 @@ def loginAdminSuccess(request):
 								content_type="applicationjson")
 
 	token_json = response.json()
-
-	userModel = get_object_or_404(UserAuth, username=username)
-	depends = 0
 	try:
-		user = UserAuth.objects.get(id=userModel.id, is_superuser=1)
+		userModel = get_object_or_404(UserAuth, username=username)
 		depends = 0
-	except:
 		try:
-			user = UserAuth.objects.get(id=userModel.id)
-			usuario = Usuarios.objects.get(idUser=userModel.id,tipoUsuario=True)
-			depends=1
+			user = UserAuth.objects.get(id=userModel.id, is_superuser=1)
+			depends = 0
 		except:
 			try:
 				user = UserAuth.objects.get(id=userModel.id)
-				usuario = Usuarios.objects.get(idUser=userModel.id,tipoUsuario=False)
-				depends=2
+				usuario = Usuarios.objects.get(idUser=userModel.id,tipoUsuario=True)
+				depends=1
 			except:
-				messages.error(request, 'ERROR')
-				return redirect('/login_page')
-			
+				try:
+					user = UserAuth.objects.get(id=userModel.id)
+					usuario = Usuarios.objects.get(idUser=userModel.id,tipoUsuario=False)
+					depends=2
+				except:
+					messages.error(request, 'ERROR')
+					return redirect('/login_page')
+	except:
+		messages.error(request, 'ERROR')
+		return redirect('/login_page')
+
+		return redirect('/dashboard_student')
+	
 	try:
 		userAuth = authenticate(username=username,password=password)
 		login(request, userAuth)
@@ -417,6 +511,7 @@ def loginAdminSuccess(request):
 		return redirect('/dashboard_staff')
 	elif(depends==2):
 		return redirect('/dashboard_student')
+
 def logout_view(request):
 	request.session['token'] = None
 	logout(request)
