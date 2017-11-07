@@ -111,9 +111,9 @@ class UsuariosViewSet(mixins.ListModelMixin,
 				else:
 					return Response("0")
 			else:
-				return Response({'detail': "443"}, status=status.HTTP_401_UNAUTHORIZED)
+				return Response("0")
 		else:
-			return Response({'detail': "464"}, status=status.HTTP_401_UNAUTHORIZED)
+			return Response("0")
 
 class EscuelasViewSet(mixins.ListModelMixin,
 	mixins.CreateModelMixin, 
