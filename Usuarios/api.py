@@ -251,7 +251,7 @@ class EveryoneViewSet(mixins.ListModelMixin,
 	def getGruposbyProfesorId(self, request):
 		try:	
 			id=request.GET['id']
-			profesores = Usuarios.objects.filter(idEscuela=id,tipoUsuario=False)
+			profesores = Usuarios.objects.filter(idEscuela=id,tipoUsuario=True)
 			grupos = []
 			for y in profesores:
 				grupos.append(Grupos.objects.get(idGrupo=y.idGrupo.idGrupo))
