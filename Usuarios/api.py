@@ -99,14 +99,17 @@ class UsuariosViewSet(mixins.ListModelMixin,
 					try:
 						response = requests.request("POST", url, data=payload, headers=headers)
 					except:
-						return Response({'detail': "461"}, status=status.HTTP_401_UNAUTHORIZED)
+						return Response("0")
 
 					token_json = response.json()
+					try:
+						serResp["token"] = token_json["access_token"]
+						return Response(token_json["access_token"])
+					except:
+						return Response("0")
 					
-					serResp["token"] = token_json["access_token"]
-					return Response(token_json["access_token"])
 				else:
-					return Response({'detail': "461"}, status=status.HTTP_401_UNAUTHORIZED)
+					return Response("0")
 			else:
 				return Response({'detail': "443"}, status=status.HTTP_401_UNAUTHORIZED)
 		else:
@@ -248,7 +251,7 @@ class EveryoneViewSet(mixins.ListModelMixin,
 	def getGruposbyProfesorId(self, request):
 		try:	
 			id=request.GET['id']
-			profesores = Usuarios.objects.filter(idEscuela=id)
+			profesores = Usuarios.objects.filter(idEscuela=id,tipoUsuario=False)
 			grupos = []
 			for y in profesores:
 				grupos.append(Grupos.objects.get(idGrupo=y.idGrupo.idGrupo))
