@@ -69,50 +69,52 @@ class UsuariosViewSet(mixins.ListModelMixin,
 		serializer = UsuarioLoginSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		valid = serializer.validated_data
-		if (valid.get('usuario') is not None):
-			userModel = get_object_or_404(UserAuth, username=valid.get('usuario'))
-			if userModel.is_active:
-				try:
-					
-					user = UserAuth.objects.get(id=userModel.id)
-				except:
-					return Response({'detail': "464"}, status=status.HTTP_401_UNAUTHORIZED,
-								content_type="applicationjson")
-
-				userAuth = authenticate(username=valid.get('usuario'),
-										password=valid.get('contrasena'))
-				if userAuth is not None:
-					login(request, userAuth)
-					resp = Usuarios.objects.get(idUser=userModel.id)
-					serResp = UsuarioSerializer(resp).data
-					#peticion token
-					username=valid.get('usuario')
-					password=valid.get('contrasena')
-					url = "http://"+SERVER_IP + "/o/token/"
-					payload = "grant_type=password&password="+password+"&username="+username
-					headers = {
-					'content-type': "application/x-www-form-urlencoded",
-					'authorization': "Basic "+BASIC_TOKEN,
-					'cache-control': "no-cache",
-					'postman-token': "cba85345-7c4f-f0fc-c3f3-f2e86bfca26c"
-					}
+		try:
+			if (valid.get('usuario') is not None):
+				userModel = get_object_or_404(UserAuth, username=valid.get('usuario'))
+				if userModel.is_active:
 					try:
-						response = requests.request("POST", url, data=payload, headers=headers)
+						
+						user = UserAuth.objects.get(id=userModel.id)
 					except:
 						return Response("0")
 
-					token_json = response.json()
-					try:
-						serResp["token"] = token_json["access_token"]
-						return Response(token_json["access_token"])
-					except:
+					userAuth = authenticate(username=valid.get('usuario'),
+											password=valid.get('contrasena'))
+					if userAuth is not None:
+						login(request, userAuth)
+						resp = Usuarios.objects.get(idUser=userModel.id)
+						serResp = UsuarioSerializer(resp).data
+						#peticion token
+						username=valid.get('usuario')
+						password=valid.get('contrasena')
+						url = "http://"+SERVER_IP + "/o/token/"
+						payload = "grant_type=password&password="+password+"&username="+username
+						headers = {
+						'content-type': "application/x-www-form-urlencoded",
+						'authorization': "Basic "+BASIC_TOKEN,
+						'cache-control': "no-cache",
+						'postman-token': "cba85345-7c4f-f0fc-c3f3-f2e86bfca26c"
+						}
+						try:
+							response = requests.request("POST", url, data=payload, headers=headers)
+						except:
+							return Response("0")
+
+						token_json = response.json()
+						try:
+							serResp["token"] = token_json["access_token"]
+							return Response(token_json["access_token"])
+						except:
+							return Response("0")
+						
+					else:
 						return Response("0")
-					
 				else:
 					return Response("0")
 			else:
 				return Response("0")
-		else:
+		except:
 			return Response("0")
 
 class EscuelasViewSet(mixins.ListModelMixin,
