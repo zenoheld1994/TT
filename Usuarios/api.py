@@ -83,7 +83,7 @@ class UsuariosViewSet(mixins.ListModelMixin,
 											password=valid.get('contrasena'))
 					if userAuth is not None:
 						login(request, userAuth)
-						resp = Usuarios.objects.get(idUser=userModel.id)
+						resp = Usuarios.objects.get(idUser=userModel.id,tipoUsuario=False)
 						serResp = UsuarioSerializer(resp).data
 						#peticion token
 						username=valid.get('usuario')
