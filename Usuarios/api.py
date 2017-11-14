@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+	#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from rest_framework import viewsets, status, mixins, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
@@ -55,14 +55,19 @@ class UsuariosViewSet(mixins.ListModelMixin,
 	def updateUsuario(self, request):
 		usuario = UsuarioUpdateSerializer(data=request.data)
 		usuario.is_valid(raise_exception=True)
-		result = usuario.update(request.data)
+		result = usuario.update(request.data,auxid=request.user.pk)
 		return Response(result)
 	@list_route(methods=['GET'], permission_classes=[SuperAdminPermission])
 	def getUsuarios(self, request):
 		usuarios = Usuarios.objects.all()
 		seruser = UsuarioSerializer(usuarios,many=True)
 		return Response(seruser.data)
-
+	@list_route(methods=['GET'], permission_classes=[permissions.IsAuthenticated])
+	def getUsuario(self, request):
+		id=request.GET['id']
+		usuario = Usuarios.objects.get(idUser=id)
+		seruser = UsuarioSerializer(usuario)
+		return Response(seruser.data)
 	@csrf_exempt
 	@list_route(methods=['POST'], permission_classes=[permissions.AllowAny])
 	def login(self, request):

@@ -21,6 +21,8 @@ urlpatterns = [
 	url(r'^dashboard_student$', views.dashboardStudent),
 	url(r'^editGroup$', views.group_admin),
 	url(r'^saveGroup$', views.group_save),
-	url(r'^studentList$', views.alumno_list),
+	url(r'^edituser$', views.user_edit),
+	url(r'^saveUser$', views.user_save),
+
 	
 ]

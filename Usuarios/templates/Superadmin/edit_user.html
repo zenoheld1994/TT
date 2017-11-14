@@ -1,0 +1,86 @@
+{% extends 'Superadmin/menu_layout_student.html' %}
+  {% block content %}
+{% load staticfiles %}
+
+	{% block title %}TT2016-B065 | Editar alumno{% endblock %}
+    <div class="page-head">
+        <div class="page-title">
+            <h1>Editar alumno</h1>
+        </div>
+    </div>
+     <div class="row">
+                        <div class="col-md-12">       <!-- BEGIN SAMPLE TABLE PORTLET-->
+                            <div class="portlet light bordered">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <i class="icon-social-dribbble font-green"></i>
+                                        <span class="caption-subject font-green bold uppercase">Alumno</span>
+                                    </div>
+                                <div class="portlet-body">
+            <form class="login-form" action="saveUser" method="post">
+
+
+                                </div>
+            	{% if messages %}
+            		{% for message in messages %}
+            			{% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}
+
+		            	<div class="alert alert-success ">
+		                    <button class="close" data-close="alert"></button>
+		                    <span>Se guardaron los cambios</span>
+		                </div>
+
+		                {% endif %}
+	                {% endfor %}
+                {% endif %}
+                {% if messages %}
+            		{% for message in messages %}
+            			{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+
+		            	<div class="alert alert-danger ">
+		                    <button class="close" data-close="alert"></button>
+		                    <span>Hubo un error, intenta nuevamente.</span>
+		                </div>
+		                {% endif %}
+	                {% endfor %}
+                {% endif %}
+            
+                
+                <div class="form-group col-md-offset-4">
+                    <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
+                    <label class="control-label ">Nombre de alumno</label>
+                    <div class="input-icon">
+
+                        <i class="fa fa-graduation-cap"></i>
+
+                        <input class="form-control placeholder-no-fix" style="width: 40%;" type="text" autocomplete="off" placeholder="Nombre del alumno(a)" name="school_name" id="school_name" value="{{usuario.nombre}}"/> 
+                    </div>
+                        <br>
+
+                        <button type="submit" class="btn green "> Editar </button>
+                        <br>
+                </div>
+
+                	
+
+                
+                
+            </form>
+                            </div>
+                            <!-- END SAMPLE TABLE PORTLET-->
+                        </div>
+                        
+                    </div>
+                    
+
+	{% block js_2 %}
+        
+	<script type="text/javascript">
+
+		var set_active = document.getElementById("perfil");
+		set_active.className += " active";
+		set_active.className += " open";
+		
+	</script>
+	{% endblock %}
+{% endblock %}   

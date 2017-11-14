@@ -58,6 +58,64 @@ def school_create(request):
 				return render(request, 'Superadmin/Unauthorized.html', {},status=403)
 	except:
 		return redirect('/logout_admin')
+def user_edit(request):
+	try:
+		tokenSession = AccessToken.objects.get(token=request.session['token'])
+		usuario = request.session['userid']
+		if timezone.now() > tokenSession.expires:
+			request.session['token'] = None
+			return redirect('/logout_admin')
+		else:
+			try:	
+				user = UserAuth.objects.get(id=usuario)
+				url = "http://"+SERVER_IP+"/v1/usuarios/getUsuario?id="+str(usuario)
+				headers = {
+				    'content-type': "application/json",
+				    'authorization': "Bearer " +str(tokenSession),
+				    'cache-control': "no-cache"
+				    }
+				response = requests.request("GET", url, headers=headers)
+				response.encoding = 'UTF-8'
+				print(response.text)
+				user = json.loads(response.text)
+
+				return render(request, 'Superadmin/edit_user.html', {"usuario":user})
+			except:
+				return render(request, 'Superadmin/Unauthorized.html', {},status=403)
+	except:
+		return redirect('/logout_admin')
+@csrf_exempt
+def user_save(request):
+	name=request.POST['school_name']
+	#name2= name.encode('utf8')
+	#name = name2
+	tokenSession = AccessToken.objects.get(token=request.session['token'])
+	usuario = request.session['userid']
+	if timezone.now() > tokenSession.expires:
+		request.session['token'] = None
+		return redirect('/logout_admin')
+	else:
+		try:
+			#user = UserAuth.objects.get(id=usuarios)
+			url = "http://"+SERVER_IP+"/v1/usuarios/updateUsuario"
+			payload = "{\n  \"nombre\": \""+name+"\"\n}"
+			headers = {
+				'content-type': "application/json",
+				'authorization': "Bearer " +str(tokenSession),
+				'cache-control': "no-cache"
+				}
+			response = requests.request("PATCH",url,data=payload, headers=headers)
+			status=response.status_code
+		
+			
+			messages.success(request, 'ANY')
+			return redirect('/edituser')
+			
+				
+		except:
+			return render(request, 'Superadmin/Unauthorized.html', {})
+			
+
 @csrf_exempt
 def school_save(request):
 	name=request.POST['school_name']
@@ -309,7 +367,7 @@ def dashboardStaff(request):
 				try:
 					user = UserAuth.objects.get(id=ID)
 					request.session['userid']
-					username = request.session['username']
+					username = request.session['nombredeusuario']
 					return render(request, 'Superadmin/Welcome_staff.html', {"username":username})
 				except:
 					return render(request, 'Unauthorized.html', {})
@@ -319,24 +377,24 @@ def dashboardStaff(request):
 		print('Token not found')
 		return redirect('/logout_admin')
 def dashboardStudent(request):
-	try:
-		tokenSession = AccessToken.objects.get(token=request.session['token'])
-		ID = request.session['userid']
-		if timezone.now() > tokenSession.expires:
-			request.session['token'] = None
-			return redirect('/logout_admin')
+	
+	tokenSession = AccessToken.objects.get(token=request.session['token'])
+	ID = request.session['userid']
+	if timezone.now() > tokenSession.expires:
+		request.session['token'] = None
+		return redirect('/logout_admin')
+	else:
+		if ID:
+			
+			user = Usuarios.objects.get(idUser=ID,tipoUsuario=False)
+			request.session['userid']
+			username = request.session['nombredeusuario']
+			return render(request, 'Superadmin/Welcome_student.html', {"username":username})
+		
+			return render(request, 'Unauthorized.html', {})
 		else:
-			if ID:
-				try:
-					user = Usuarios.objects.get(idUser=ID,tipoUsuario=False)
-					request.session['userid']
-					username = request.session['username']
-					return render(request, 'Superadmin/Welcome_student.html', {"username":username})
-				except:
-					return render(request, 'Unauthorized.html', {})
-			else:
-				return redirect('/logout_admin')
-	except:
+			return redirect('/logout_admin')
+	
 		print('Token not found')
 		return redirect('/logout_admin')
 
@@ -461,13 +519,15 @@ def loginAdminSuccess(request):
 	try:
 		response = requests.request("POST", url, data=payload, headers=headers)
 	except:
-		return render({'detail': "464"}, status=status.HTTP_401_UNAUTHORIZED,
-								content_type="applicationjson")
+		messages.error(request, 'ERROR')
+		return redirect('/login_page')
 
 	token_json = response.json()
+	
 	try:
 		userModel = get_object_or_404(UserAuth, username=username)
 		depends = 0
+	
 		try:
 			user = UserAuth.objects.get(id=userModel.id, is_superuser=1)
 			depends = 0
@@ -481,6 +541,7 @@ def loginAdminSuccess(request):
 					user = UserAuth.objects.get(id=userModel.id)
 					usuario = Usuarios.objects.get(idUser=userModel.id,tipoUsuario=False)
 					depends=2
+	
 				except:
 					messages.error(request, 'ERROR')
 					return redirect('/login_page')
@@ -490,17 +551,20 @@ def loginAdminSuccess(request):
 
 		return redirect('/dashboard_student')
 	
+
 	try:
 		userAuth = authenticate(username=username,password=password)
 		login(request, userAuth)
 	except:
 		messages.error(request, 'ERROR')
 		return redirect('/login_page')
-	try:
-	
+
+	try:	
 		request.session['userid'] = userModel.id
 		request.session['username'] = username
+		
 		request.session['token'] = token_json['access_token']
+		request.session['nombredeusuario'] = usuario.nombre
 	except:
 		messages.error(request, 'ERROR')
 		return redirect('/login_page')

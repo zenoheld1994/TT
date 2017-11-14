@@ -11,6 +11,7 @@ class Leccion(models.Model):
 		db_table = "Leccion"
 	idLeccion = models.AutoField(primary_key=True)
 	nombre = models.CharField(max_length=50,unique=True)
+	maxima = models.IntegerField(blank=False)
 class Grupos(models.Model):
 	class Meta:
 		db_table = "Grupos"

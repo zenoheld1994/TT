@@ -181,7 +181,7 @@ class UsuarioUpdateSerializer(serializers.Serializer):
 	contrasena = serializers.CharField(required=False)
 	nombre = serializers.CharField(required=False)
 	usuario = serializers.CharField(required=False)
-	idUsuario = serializers.IntegerField(required=True)
+	#idUsuario = serializers.IntegerField(required=True)
 	idGrupo = serializers.CharField(required=False)
 	#de mientras se enablea el oauth2
 	class Meta:
@@ -197,14 +197,10 @@ class UsuarioUpdateSerializer(serializers.Serializer):
 		if UserAuth.objects.filter(username=value).exists():
 			raise serializers.ValidationError("Username already exists")
 		return value
-	def update(self, validated_data):
-		instance = Usuarios.objects.get(pk=self.data.get('idUsuario'))
+	def update(self, validated_data,auxid):
+		instance = Usuarios.objects.get(idUser=auxid)
 		userauth = UserAuth.objects.get(pk=instance.idUser)
-		try:
-			userauth.set_password(self.data.get('contrasena'))
-			userauth.save()
-		except:
-			None
+		
 		try:
 			userauth.username=self.data.get('usuario')
 			userauth.save()
@@ -291,6 +287,7 @@ class GrupoSerializer(serializers.Serializer):
 class LeccionSerializer(serializers.Serializer):
 	idLeccion = serializers.CharField(required=False)
 	nombre = serializers.CharField(required=False)
+	maxima = serializers.IntegerField(required=False)
 	class Meta:
 		model = Leccion
 		fields = ('nombre')
@@ -302,7 +299,7 @@ class LeccionSerializer(serializers.Serializer):
 		except:
 			id=1
 		try:
-			leccion = Leccion.objects.create(nombre=nombre+str(id),idLeccion=id)
+			leccion = Leccion.objects.create(nombre=nombre+str(id),idLeccion=id,maxima=self.data.get('maxima'))
 		except:
 			return "ERROR WHILE CREATING LECCION"
 		return LeccionSerializer(leccion).data
