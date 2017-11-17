@@ -548,23 +548,27 @@ def loginAdminSuccess(request):
 	except:
 		messages.error(request, 'ERROR')
 		return redirect('/login_page')
-
-		return redirect('/dashboard_student')
 	
 
 	try:
+		print("llego aqui")
 		userAuth = authenticate(username=username,password=password)
+		print("llego aqui 2 ")
 		login(request, userAuth)
 	except:
 		messages.error(request, 'ERROR')
 		return redirect('/login_page')
 
 	try:	
+
 		request.session['userid'] = userModel.id
 		request.session['username'] = username
 		
 		request.session['token'] = token_json['access_token']
-		request.session['nombredeusuario'] = usuario.nombre
+		try:
+			request.session['nombredeusuario'] = usuario.nombre
+		except:
+			None
 	except:
 		messages.error(request, 'ERROR')
 		return redirect('/login_page')
