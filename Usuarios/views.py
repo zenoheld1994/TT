@@ -225,8 +225,6 @@ def school_list(request):
 		return redirect('/logout_admin')
 	
 
-
-
 def user_list(request):
 	
 	tokenSession = AccessToken.objects.get(token=request.session['token'])
@@ -282,30 +280,30 @@ def alumno_list(request):
 		#except:
 			return redirect('/logout_admin')
 def leccion_list(request):
-	try:
-		tokenSession = AccessToken.objects.get(token=request.session['token'])
-		usuario = request.session['userid']
-		if timezone.now() > tokenSession.expires:
-			request.session['token'] = None
-			return redirect('/logout_admin')
-		else:
-			try:
-				user = UserAuth.objects.get(id=usuario,is_superuser=True)
-				url = "http://"+SERVER_IP+"/v1/lecciones/"
-				headers = {
-					'authorization': "Bearer " +str(tokenSession),
-					'cache-control': "no-cache",
-					'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
-					}
-				response = requests.request("GET", url, headers=headers)
-				response.encoding = 'UTF-8'
-				lecciones = json.loads(response.text)
-
-				return render(request,'Superadmin/leccion_list.html' , {"SERVER_IP":SERVER_IP,"lecciones":lecciones})
-			except:
-				return render(request, 'Superadmin/Unauthorized.html', {})
-	except:
+	
+	tokenSession = AccessToken.objects.get(token=request.session['token'])
+	usuario = request.session['userid']
+	if timezone.now() > tokenSession.expires:
+		request.session['token'] = None
 		return redirect('/logout_admin')
+	else:
+		
+			user = UserAuth.objects.get(id=usuario,is_superuser=True)
+			url = "http://"+SERVER_IP+"/v1/lecciones/"
+			headers = {
+				'authorization': "Bearer " +str(tokenSession),
+				'cache-control': "no-cache",
+				'postman-token': "a69b6bcd-a95f-7d67-98a3-716d9ffe91c1"
+				}
+			response = requests.request("GET", url, headers=headers)
+			response.encoding = 'UTF-8'
+			lecciones = json.loads(response.text)
+
+			return render(request,'Superadmin/leccion_list.html' , {"SERVER_IP":SERVER_IP,"lecciones":lecciones})
+		
+			return render(request, 'Superadmin/Unauthorized.html', {})
+
+	return redirect('/logout_admin')
 
 def puntuaciones_list(request):
 	try:

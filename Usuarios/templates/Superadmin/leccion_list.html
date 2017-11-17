@@ -34,8 +34,8 @@
 
                                 </div>
                                 <center>
-                                    <button class="btn green btn-outline" "><i class="fa fa-plus"></i> Crear</button>
-                                    <button class="btn btn-outline  purple" data-toggle="modal" href="#seeScore" onclick="setdata('{{leccion.idLeccion}}')"><i class="fa fa-edit"></i> Ver</button>
+                                    <button class="btn green btn-outline" data-toggle="modal" href="#createPuntuacion" ><i class="fa fa-edit"></i> Crear</button>
+
                                 </center>
                                   
                                 <div class="portlet-body">
@@ -48,6 +48,7 @@
                                                 <tr>
                                                     <th> # </th>
                                                     <th> Nombre </th>
+                                                    <th> Máxima puntuación </th>
                                                     <th> Eliminar </th>
                                                 </tr>
                                             </thead>
@@ -57,6 +58,7 @@
                                                 <tr>
                                                     <td id="{{leccion.idLeccion}}">{{leccion.idLeccion}}</td>
                                                     <td id="{{leccion.idLeccion}}">{{leccion.nombre}}</td>
+                                                    <td id="{{leccion.idLeccion}}">{{leccion.maxima}}</td>
                                                     <td><button class="btn red btn-outline" onclick="deleteLeccion('{{leccion.idLeccion}}')"><i class="fa fa-close"></i> Eliminar</button>
                                                     </td>
                                                     
@@ -72,7 +74,7 @@
                         </div>
                         
                     </div>
-<div id="createStaff" class="modal fade" tabindex="-1" aria-hidden="true">
+<div id="createPuntuacion" class="modal fade" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
       <div class="modal-content">
           <div class="modal-header">
@@ -80,7 +82,7 @@
               <h4 class="modal-title caption-subject font-green sbold uppercase">Crear lección</h4>
           </div>
           <div class="modal-body">
-              <div class="scroller" style="height:1000px" data-always-visible="1" data-rail-visible1="1">
+              <div class="scroller" style="height:200px" data-always-visible="1" data-rail-visible1="1">
                   <div class="row">
                       <div class="col-md-12">
                           <!-- BEGIN VALIDATION STATES-->
@@ -98,7 +100,7 @@
                                           <div class="form-group form-md-line-input">
                                               <label class="col-md-3 control-label" for="form_control_2">Máxima Puntuación</label>
                                               <div class="col-md-9">
-                                                  <input type="text" class="form-control" placeholder="" id="FirstnameC" name="name">
+                                                  <input type="text" class="form-control" placeholder="" id="puntuacion" name="name">
                                                   <div class="form-control-focus"> </div>
                                                   <!--<span class="help-block">Some help goes here...</span>-->
                                               </div>
@@ -109,8 +111,8 @@
                                       <div class="form-actions">
                                           <div class="row" style="text-align: right;">
                                               <div class="col-md-offset-3 col-md-9">
-                                                  <button type="button" data-dismiss="modal" class="btn btn-outline dark">Close</button>
-                                                  <a href="javascript:;" class="btn green" onclick="     (true)">Submit</a>
+                                                  <button type="button" data-dismiss="modal" class="btn btn-outline dark">Cancelar</button>
+                                                  <a href="javascript:;" data-dismiss="modal" class="btn green" onclick="createLeccion()">Crear</a>
                                               </div>
                                           </div>
                                       </div>
@@ -167,6 +169,7 @@
      
         function createLeccion() {
            var token = '{{request.session.token}}';
+           var maxima = document.getElementById("puntuacion").value;
             swal({
                           title: "¿Desea realizar esta operación?",
                           text: "Crear Lección",
@@ -189,6 +192,7 @@
                                     "cache-control": "no-cache"
                                   },
                                   "processData": false,
+                                  "data": "{\n\t\"maxima\": "+maxima+"\n}\n",
                                   
                                   
                                   beforeSend: function () {
