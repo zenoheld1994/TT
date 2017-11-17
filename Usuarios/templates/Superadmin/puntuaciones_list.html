@@ -53,7 +53,7 @@
                                                      
                                                     <td id="{{leccion.idEscuela}}">
 
-                                                        <button class="btn btn-outline  purple" data-toggle="modal" href="#seeScore" onclick="setdata('{{leccion.idLeccion}}')"><i class="fa fa-edit"></i> Ver</button>
+                                                        <button class="btn btn-outline  purple" data-toggle="modal" href="#seeScore" onclick="setdata('{{leccion.idLeccion}}','{{leccion.maxima}}')"><i class="fa fa-edit"></i> Ver</button>
 
                                                     </td>
 
@@ -77,10 +77,14 @@
                 <h4 class="modal-title caption-subject font-green sbold uppercase">Ver puntuaciones</h4>
             </div>
             <div class="modal-body">
+                <center>
+                <h5 class="modal-title caption-subject font-green sbold uppercase">Máxima puntuación <input type="text" id="maxima" disabled="disabled" ></h5>
+                </center>
                 <div class="scroller" style="height:310px" data-always-visible="1" data-rail-visible1="1">
                     <div class="row">
                         <div class="col-md-12">
                             <!-- BEGIN VALIDATION STATES-->
+
                             <div class="portlet light portlet-fit portlet-form bordered">
 
                                 <div class="portlet-body">
@@ -163,7 +167,7 @@
         var table = null;
         
 
-        function setdata(id){
+        function setdata(id,maxima){
             var token = '{{request.session.token}}';
             var settings = {
               "async": true,
@@ -204,7 +208,9 @@
                         { "mData": "puntuacion" }
                     ]
                 } );
+                document.getElementById("maxima").value=maxima;
             });
+
         }
         $("#seeScore").on("hidden.bs.modal", function () {
             table.destroy();
