@@ -164,11 +164,11 @@
                 </div>
 
                 <div class="form-actions">
-                    <button id="register-back-btn" type="button" class="btn red btn-outline"> Cancelar </button>
+                    <button id="register-back-btn" type="button" onclick="resetform('myform')" class="btn red btn-outline"> Cancelar </button>
                     <button type="submit"   class="btn green pull-right"> Crear </button>
                 </div>
             </form>
-            <form class="register-form-2" action="login_page_create_alumno" method="post" id="" style="display:none;">
+            <form class="register-form-2" action="login_page_create_alumno" method="post" id="myform2" style="display:none;">
                 <h3>Registro de Alumno</h3>
                 
 
@@ -187,8 +187,8 @@
                         <input class="form-control placeholder-no-fix" type="text" autocomplete="off" placeholder="Usuario" name="address" id="address" /> </div>
                 </div>
                 <div class="form-group">
-                    <label class="control-label visible-ie8 visible-ie9">Escuela</label>
-                    <select name="country" id="school_list" class="select2 form-control" onchange="groups()">
+                    <label class="contrsol-label visible-ie8 visible-ie9">Escuela</label>
+                    <select name="school_list" id="school_list" class="select2 form-control" onchange="groups()">
                         <option value="">
 
 
@@ -201,11 +201,7 @@
                 <div class="form-group">
                     <label class="control-label visible-ie8 visible-ie9">Grupo</label>
                     <select name="grupoalumno" id="grupoalumno" class="select2 form-control">
-                        
-                        
-                              
-
-                        
+                        <option value="">                        
                     </select>   
                 </div>  
 
@@ -291,6 +287,9 @@
                 }
 
             });
+            }
+            function resetform(idform){
+                document.getElementById(idform).reset();
             }
 
         </script>

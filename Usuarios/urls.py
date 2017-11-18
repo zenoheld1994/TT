@@ -15,7 +15,6 @@ urlpatterns = [
 	url(r'^login_page_create$', views.profesor_create),
 	url(r'^login_page_create_alumno$', views.alumno_create),
 	url(r'^dashboard_staff$', views.dashboardStaff),
-	#url(r'^scoreList$', views.score_list),puntuaciones_list
 	url(r'^puntuacionesList$', views.puntuaciones_list),
 	url(r'^leccionList$', views.leccion_list),
 	url(r'^dashboard_student$', views.dashboardStudent),
@@ -24,8 +23,5 @@ urlpatterns = [
 	url(r'^edituser$', views.user_edit),
 	url(r'^saveUser$', views.user_save),
 	url(r'^studentList$', views.alumno_list),
-
-
-
 	
 ]
