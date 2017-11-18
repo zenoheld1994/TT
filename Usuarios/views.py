@@ -251,34 +251,37 @@ def user_list(request):
 		except:
 			return redirect('/logout_admin')
 def alumno_list(request):
-	
-	tokenSession = AccessToken.objects.get(token=request.session['token'])
-	usuario = request.session['userid']
-	if timezone.now() > tokenSession.expires:
-		request.session['token'] = None
-		return redirect('/logout_admin')
-	else:
-		#try:
-			user = UserAuth.objects.get(id=usuario)
-			usuario = Usuarios.objects.get(idUser=usuario)
-
-			url = "http://"+SERVER_IP+"/v1/puntuaciones/getAlumnosbyGrupo?id="+str(usuario.idGrupo.idGrupo)
-			headers = {
-				'authorization': "Bearer " +str(tokenSession),
-				"content-type": "application/json",
-				'cache-control': "no-cache"
-
-				}
-
-			response = requests.request("GET", url, headers=headers)
-			print(response.text)
-			response.encoding = 'UTF-8'
-			alumnos = json.loads(response.text)
-			
-			grupo = usuario.idGrupo.nombre
-			return render(request,'Superadmin/student_list.html' , {"SERVER_IP":SERVER_IP,"alumnos":alumnos,"grupo":grupo})
-		#except:
+	try:
+		tokenSession = AccessToken.objects.get(token=request.session['token'])
+		usuario = request.session['userid']
+		if timezone.now() > tokenSession.expires:
+			request.session['token'] = None
 			return redirect('/logout_admin')
+		else:
+			try:
+				user = UserAuth.objects.get(id=usuario)
+				usuario = Usuarios.objects.get(idUser=usuario)
+
+				url = "http://"+SERVER_IP+"/v1/puntuaciones/getAlumnosbyGrupo?id="+str(usuario.idGrupo.idGrupo)
+				headers = {
+					'authorization': "Bearer " +str(tokenSession),
+					"content-type": "application/json",
+					'cache-control': "no-cache"
+
+					}
+
+				response = requests.request("GET", url, headers=headers)
+				print(response.text)
+				response.encoding = 'UTF-8'
+				alumnos = json.loads(response.text)
+				
+				grupo = usuario.idGrupo.nombre
+				return render(request,'Superadmin/student_list.html' , {"SERVER_IP":SERVER_IP,"alumnos":alumnos,"grupo":grupo})
+			except:
+				return redirect('/logout_admin')
+	except:
+		return redirect('/logout_admin')
+
 def leccion_list(request):
 	
 	tokenSession = AccessToken.objects.get(token=request.session['token'])
