@@ -177,9 +177,10 @@ def profesor_create(request):
 def alumno_create(request):
 	name=(request.POST['fullname'])
 	user=(request.POST['address'])
-	school=request.POST['country']
+	school=request.POST['school_list']
 	password=request.POST['password2']
 	grupo = request.POST['grupoalumno']
+	print("elgrupo",school)
 	url = "http://"+SERVER_IP+"/v1/everyone/createAlumno"
 	payload = "{\n    \"nombre\": \""+name+"\",\n    \"usuario\": \""+user+"\",\n    \"idEscuela\":\""+school+"\",\n    \"grupo\":\""+grupo+"\",\n    \"contrasena\":\""+password+"\" \n}"
 	headers = {
@@ -188,7 +189,7 @@ def alumno_create(request):
 		}
 	response = requests.request("POST", url,data=payload, headers=headers)
 	status=response.status_code
-
+	print(response)
 	try:
 		messages.success(request, 'ANY')
 		return redirect('/login_page')
@@ -476,32 +477,7 @@ def school_list(request):
 				return render(request, 'Superadmin/Unauthorized.html', {})
 	except:
 		return redirect('/logout_admin')
-'''def score_list(request):
 
-	#try:
-	tokenSession = AccessToken.objects.get(token=request.session['token'])
-	usuario = request.session['userid']
-
-	if timezone.now() > tokenSession.expires:
-		#print("ERRROR1")
-		request.session['token'] = None
-		return redirect('/logout_admin')
-	else:
-		try:
-			user = Usuarios.objects.get(idUser=usuario,tipoUsuario=False)
-			url = "http://"+SERVER_IP+"/v1/puntuaciones/getPuntuacionbyAlumno"
-			headers = {
-				'authorization': "Bearer " +str(tokenSession),
-				'cache-control': "no-cache"
-				}
-			response = requests.request("GET", url, headers=headers)
-			response.encoding = 'UTF-8'
-			puntuaciones = json.loads(response.text)
-			
-			return render(request,'Superadmin/puntuaciones_list.html'.encode('utf8') , {"SERVER_IP":SERVER_IP,"puntuaciones":puntuaciones})
-		except:
-			return render(request, 'Superadmin/Unauthorized.html', {})
-	#except:'''
 			
 
 #####################################
@@ -542,7 +518,6 @@ def loginAdminSuccess(request):
 					user = UserAuth.objects.get(id=userModel.id)
 					usuario = Usuarios.objects.get(idUser=userModel.id,tipoUsuario=False)
 					depends=2
-	
 				except:
 					messages.error(request, 'ERROR')
 					return redirect('/login_page')
@@ -552,9 +527,8 @@ def loginAdminSuccess(request):
 	
 
 	try:
-		print("llego aqui")
+	
 		userAuth = authenticate(username=username,password=password)
-		print("llego aqui 2 ")
 		login(request, userAuth)
 	except:
 		messages.error(request, 'ERROR')
@@ -564,15 +538,18 @@ def loginAdminSuccess(request):
 
 		request.session['userid'] = userModel.id
 		request.session['username'] = username
-		
+			
 		request.session['token'] = token_json['access_token']
 		try:
 			request.session['nombredeusuario'] = usuario.nombre
 		except:
-			None
+			messages.error(request, 'ERROR')
+			return redirect('/login_page')
 	except:
 		messages.error(request, 'ERROR')
 		return redirect('/login_page')
+	
+	
 
 	if(depends==0):
 		return redirect('/dashboard_admin')
